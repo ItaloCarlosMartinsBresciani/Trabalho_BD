@@ -1,0 +1,77 @@
+1 Introdução
+1.1 Descrição do tema alvo
+O mercado de créditos de carbono é um mecanismo financeiro e ambiental fundamental para a mitigação das mudanças climáticas globais. Ele funciona atribuindo um valor monetário à redução ou remoção de gases de efeito estufa (GEE) da atmosfera, onde um crédito de carbono equivale a uma tonelada de dióxido de carbono equivalente (tCO2e) que deixou de ser emitida ou que foi sequestrada.
+
+Diferentemente de transações financeiras comuns, o mercado voluntário de carbono exige um nível rigoroso de rastreabilidade, transparência e base científica para garantir a integridade ambiental dos créditos transacionados. Para seu êxito e para evitar práticas como o greenwashing (falsa aparência de sustentabilidade) e a dupla contagem (venda ou uso do mesmo crédito mais de uma vez), o ecossistema apoia-se em metodologias científicas validadas, auditorias independentes e registros imutáveis de transações.
+
+Nesse contexto, os projetos ambientais, sejam eles de reflorestamento, transição energética ou captura de metano, funcionam como a fonte primária de geração de ativos. A credibilidade desses ativos está intimamente ligada ao rigor da avaliação feita por órgãos independentes e à transparência das áreas geográficas e metodologias aplicadas.
+
+A "CarbonTrack" (nome fictício para o nosso sistema) é uma plataforma de registro e negociação focada no ciclo de vida dos créditos de carbono. Seu objetivo é integrar os dados de projetos ambientais, laudos de auditorias e transações financeiras para auxiliar as empresas na compensação de suas emissões de forma segura e auditável. A plataforma conta com uma visualização integrada da origem do crédito, atrelada aos relatórios de certificadoras independentes, garantindo que o comprador final tenha total confiança na origem do ativo ambiental que está adquirindo para abater suas metas de ESG (Ambiental, Social e Governança).
+
+Assim, as informações apresentadas servem como um núcleo de confiança (fonte de verdade) para toda a cadeia do mercado voluntário. Além disso, por tratar-se de um sistema que envolve transações financeiras e dados de inteligência de mercado, ressalta-se o compromisso da plataforma com a segurança da informação e a integridade referencial dos dados transacionados.
+
+2 Modelo Entidade-Relacionamento
+2.1 Funcionamento geral da plataforma
+Desde a entrada na plataforma CarbonTrack, as instituições são tratadas por meio de uma hierarquia de generalização. Informações comuns a todas as instituições são registradas como Pessoa_Juridica (contendo CNPJ, Razão Social, Endereço da Sede e Data de Fundação). A partir dessa generalização genérica, o cadastro ramifica-se em dois tipos disjuntos de usuários: Empresa ou Certificadora. Essa segregação é fundamental para manter o princípio de independência, garantindo que quem desenvolve ou compra projetos não possa ser a mesma entidade que os audita.
+
+O usuário principal da frente de negócios é a Empresa, que pode atuar tanto como desenvolvedora de projetos (vendedora) quanto como compradora em busca de compensação de emissões. Para operar no sistema, toda Empresa possui, obrigatoriamente, uma Conta_Registro associada a ela. Essa conta funciona como uma "carteira" virtual (com número da conta, data de abertura e status ativo/bloqueado) onde os ativos ambientais ficam custodiados antes, durante e após as transações.
+
+Do outro lado do ecossistema, estão as Certificadoras. Estas são organizações auditoras independentes (como Verra ou Gold Standard) que possuem credenciais internacionais e um nível de rigor específico. A principal função da Certificadora no sistema é realizar uma Auditoria presencial ou documental sobre as iniciativas ambientais, emitindo um parecer final (aprovado, reprovado ou com ressalvas) e registrando a data da visita e o número do laudo.
+
+O núcleo de geração de valor do sistema ocorre no Projeto_Ambiental. Uma Empresa desenvolvedora cadastra seus projetos (com ID, nome, data de início e escopo, como florestal ou energia limpa). Para que o projeto tenha validade científica, ele deve, obrigatoriamente, seguir uma Metodologia rigorosa e previamente cadastrada no sistema (contendo código, descrição científica e versão). Além disso, o projeto está intimamente ligado a uma ou mais instâncias de Area_Geografica, que mapeiam o bioma, a quantidade de hectares e as coordenadas geoespaciais (polígono) exatas de onde a mitigação está ocorrendo.
+
+Após o cadastramento do Projeto e a aprovação formal através de uma Auditoria realizada por uma Certificadora, o projeto está apto a emitir ativos. O sistema gera, então, um Lote_Credito. Este lote é uma entidade fraca que depende existencialmente do Projeto Ambiental que o originou, sendo identificado parcialmente pelo seu "Ano de Safra" (o ano em que a redução de emissão efetivamente ocorreu). Cada Lote contém a quantidade de toneladas (créditos), um número de série global e um status operacional (Disponível, Transacionado ou Aposentado).
+
+Com os créditos gerados e atestados, a dinâmica de mercado é ativada. Uma Empresa compradora pode realizar uma Transacao (que registra o ID, data, hora e valor total). Como uma negociação pode envolver partes de diversos lotes diferentes para atingir o volume desejado pelo comprador, existe a entidade associativa Item_Transacao, que faz a ponte entre a Transação e o Lote de Crédito, registrando a quantidade específica negociada e o preço unitário daquela fração.
+
+Por fim, o ciclo de vida do carbono se encerra quando uma Empresa decide compensar suas emissões. Nesse momento, o Lote de Crédito (ou a fração dele adquirida) altera seu status e emite um Certificado_Aposentadoria. Este documento, validado por um hash criptográfico intransferível, registra a data de emissão e o beneficiário final do crédito, assegurando que aquelas toneladas de CO2e saíram definitivamente do mercado e não poderão gerar novas transações.
+
+2.2 Principais operações do sistema
+Empresa (Desenvolvedora/Vendedora)
+
+Cadastra-se e gerencia sua Conta de Registro.
+
+Registra novos Projetos Ambientais, vinculando Áreas Geográficas e a Metodologia utilizada.
+
+Solicita e vincula laudos de Auditoria aos seus projetos.
+
+Gera Lotes de Crédito atrelados aos Projetos (condicionado a laudos aprovados).
+
+Disponibiliza Lotes de Crédito para Transação.
+
+Empresa (Compradora)
+
+Pesquisa Projetos Ambientais por bioma, metodologia e ano de safra do crédito.
+
+Verifica o status e o parecer das Auditorias de um projeto.
+
+Realiza Transações para adquirir Lotes de Crédito.
+
+Solicita a emissão do Certificado de Aposentadoria para compensar suas emissões.
+
+Certificadora
+
+Cadastra-se no sistema mediante aprovação de credencial internacional.
+
+Pesquisa Projetos Ambientais que lhe foram designados.
+
+Registra as ocorrências de Auditoria, definindo o parecer final que ditará a validade do projeto.
+
+2.3 Possíveis inconsistências do sistema e notas
+Ciclo de Dependência Projeto-Auditoria-Lote: Neste ciclo, é possível que o sistema tente aprovar a geração de um Lote de Crédito para um Projeto que ainda não possui uma Auditoria favorável. Assim, é preciso garantir a consistência de informações na própria aplicação, assegurando que a entidade fraca Lote_Credito só possa ser inserida no banco de dados se o Projeto_Ambiental correspondente estiver relacionado a, pelo menos, uma Auditoria cujo atributo "Parecer_Final" seja estritamente igual a 'Aprovado'.
+
+Note 1: A especialização de Pessoa_Jurídica é total e disjunta. Uma instituição deve ser ou uma Empresa ou uma Certificadora, sendo terminantemente proibido que o CNPJ de uma Certificadora esteja associado à propriedade de uma Conta_Registro ou de um Projeto_Ambiental.
+
+Note 2: O CNPJ é o atributo chave universal para a superclasse Pessoa_Juridica, garantindo unicidade para todas as instituições na plataforma.
+
+Note 3: A entidade Lote_Credito é uma entidade fraca. Sua chave primária é composta pela combinação do atributo chave de seu proprietário (ID do Projeto_Ambiental) e sua chave parcial (Ano_Safra).
+
+Note 4: O Número de Série Global dentro de Lote_Credito deve ser único em toda a plataforma para garantir a rastreabilidade global perante os órgãos internacionais.
+
+Note 5: Apenas Lotes de Crédito com o atributo de status definido como 'Disponível' podem ser associados a um novo Item_Transacao.
+
+Note 6: O atributo "Valor_Total" da entidade Transação é um atributo derivado, calculado pelo somatório da multiplicação da "Quantidade_Negociada" pelo "Preço_Unitario" de cada Item_Transacao associado a ela.
+
+Note 7: A Conta_Registro possui um relacionamento de participação total e cardinalidade 1:1 com a Empresa; ou seja, uma conta não existe sem uma empresa, e uma empresa não pode operar sem exatamente uma conta ativa.
+
+Note 8: Um Certificado_Aposentadoria, uma vez gerado, possui caráter imutável. A sua geração altera automaticamente o status do Lote_Credito (ou da fração dele) para 'Aposentado', impedindo qualquer relacionamento futuro com novas instâncias de Transação.
