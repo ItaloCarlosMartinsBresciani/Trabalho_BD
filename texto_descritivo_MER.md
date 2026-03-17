@@ -36,9 +36,10 @@
     * *Regra do diagrama:* A linha dupla do lado de `Atividade` indica **participação total**. Toda Atividade deve ser obrigatoriamente realizada por um Originador.
 * **Contém (Projeto e Atividade):**
     * Um Projeto contém várias Atividades.
-    * *Regra do diagrama:* Há linha dupla de ambos os lados. Isso indica uma dependência existencial forte (participação total de ambos os lados); um projeto precisa ter atividades, e toda atividade pertence obrigatoriamente a um projeto.
+    * *Regra do diagrama:* A linha dupla do lado de `Projeto` indica **participação total**. Um projeto precisa ter atividades, mas nem toda atividade é contida por um Projeto.
 * **Negocia / Transação (Compradores e Originadores):**
-    * Compradores negociam com Originadores gerando uma `Transação`. 
+    * Compradores negociam com Originadores gerando uma `Transação`.
+    * Compradores podem negociar créditos de carbono entre si. 
 * **Audita / Laudo (Auditores e Atividade):**
     * Auditores avaliam uma Atividade, gerando um `Laudo`. Uma atividade "é auditada" e o auditor gera o laudo.
 * **Verifica (Certificadores/Registradoras e Laudo):**
