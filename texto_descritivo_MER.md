@@ -1,10 +1,3 @@
-Com base na imagem do seu Diagrama Entidade-Relacionamento (MER) e no que você já começou a escrever, você está no caminho certo! O diagrama utiliza notações clássicas (como entidades associativas e especialização disjunta/total), o que é ótimo para o rigor exigido na universidade. 
-
-Para completar o seu texto de forma rigorosa, precisamos incluir as entidades que faltaram, definir as **Entidades Associativas** (representadas pelos losangos dentro de retângulos) e descrever todos os **Relacionamentos**, prestando atenção nas linhas duplas (que indicam **participação total**).
-
-Aqui está a continuação e o refinamento do seu texto:
-
-***
 
 ### Sistema de gerenciamento de créditos de carbono
 
@@ -54,8 +47,3 @@ Aqui está a continuação e o refinamento do seu texto:
     * Após a verificação positiva, a Certificadora registra e emite o `Lote/Crédito` de carbono.
 
 ***
-
-**Uma dica extra para o seu trabalho universitário:**
-Para deixar o MER ainda mais completo e tirar nota máxima, defina as **cardinalidades** (1:1, 1:N, N:M) ao lado das linhas de cada relacionamento (ex: um projeto tem *N* atividades, mas uma atividade pertence a apenas *1* projeto). O seu desenho já traz as participações (linhas duplas), mas colocar os numerozinhos textualmente no seu documento reforçará o rigor do modelo! 
-
-Gostaria de ajuda para definir e descrever as cardinalidades exatas (1,N) de cada um desses relacionamentos com base na lógica de negócios de créditos de carbono?
