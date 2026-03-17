@@ -1,0 +1,61 @@
+Com base na imagem do seu Diagrama Entidade-Relacionamento (MER) e no que você já começou a escrever, você está no caminho certo! O diagrama utiliza notações clássicas (como entidades associativas e especialização disjunta/total), o que é ótimo para o rigor exigido na universidade. 
+
+Para completar o seu texto de forma rigorosa, precisamos incluir as entidades que faltaram, definir as **Entidades Associativas** (representadas pelos losangos dentro de retângulos) e descrever todos os **Relacionamentos**, prestando atenção nas linhas duplas (que indicam **participação total**).
+
+Aqui está a continuação e o refinamento do seu texto:
+
+***
+
+### Sistema de gerenciamento de créditos de carbono
+
+**Entidades:**
+
+**Pessoa Jurídica** (Entidade Supertipo): Entidade abstrata que centraliza os atributos comuns. Possui uma **Especialização Total e Disjunta** (indicada pela linha dupla e o círculo com "D"). Isso significa que toda Pessoa Jurídica no sistema *deve obrigatoriamente* pertencer a *apenas uma* das subentidades abaixo:
+* **Originadores (Desenvolvedores de projeto):** Empresas ou ONGs que planejam e executam projetos em campo que de fato removem o carbono ou evitam emissão.
+* **Auditores Independentes:** Organismos de validação e verificação que atestam se o projeto originador fez o que prometeu e se os cálculos de carbono estão corretos.
+* **Certificadores/Registradoras:** Instituições responsáveis por analisar laudos de auditoria e, a partir disso, gerar o Lote de Crédito de carbono.
+* **Compradores:** Entidades (empresas ou investidores) que adquirem os créditos de carbono gerados pelos projetos para compensar suas próprias emissões ou para investimento.
+
+**Projeto:** Iniciativa estruturada de redução, evitação ou remoção de Gases de Efeito Estufa (GEE). 
+
+**Atividade:** Ações ou fases específicas realizadas dentro do escopo de um Projeto (ex: plantio de uma área específica, instalação de equipamentos).
+
+**Lote/Crédito:** A unidade quantificada e certificada de carbono.
+* *Atributos sugeridos (conforme seu texto):* ID_Lote, Quantidade_Toneladas, Ano_Geracao (ano de captura, redução ou remoção de GEE ocorreu), Status (Pendente/Emitido).
+
+---
+
+**Entidades Associativas (Agregações):**
+*No seu diagrama, elas aparecem como losangos dentro de retângulos. Elas ocorrem quando um relacionamento muitos-para-muitos (N:M) precisa se relacionar com outras entidades ou possuir atributos próprios.*
+
+* **Transação (relacionamento *Negocia*):** Representa o evento de compra e venda formalizado entre `Compradores` e `Originadores`. 
+* **Laudo (relacionamento *Audita*):** Representa o documento oficial e o processo em que uma `Atividade` é auditada por `Auditores`. 
+
+---
+
+**Relacionamentos:**
+
+* **Participa (Originadores e Projeto):**
+    * Um Originador participa de um ou mais Projetos.
+    * *Regra do diagrama:* A linha dupla do lado de `Projeto` indica **participação total**. Ou seja, todo Projeto deve, obrigatoriamente, ter a participação de um Originador.
+* **Realiza (Originadores e Atividade):**
+    * Um Originador realiza diversas Atividades.
+    * *Regra do diagrama:* A linha dupla do lado de `Atividade` indica **participação total**. Toda Atividade deve ser obrigatoriamente realizada por um Originador.
+* **Contém (Projeto e Atividade):**
+    * Um Projeto contém várias Atividades.
+    * *Regra do diagrama:* Há linha dupla de ambos os lados. Isso indica uma dependência existencial forte (participação total de ambos os lados); um projeto precisa ter atividades, e toda atividade pertence obrigatoriamente a um projeto.
+* **Negocia / Transação (Compradores e Originadores):**
+    * Compradores negociam com Originadores gerando uma `Transação`. 
+* **Audita / Laudo (Auditores e Atividade):**
+    * Auditores avaliam uma Atividade, gerando um `Laudo`. Uma atividade "é auditada" e o auditor gera o laudo.
+* **Verifica (Certificadores/Registradoras e Laudo):**
+    * As Certificadoras não se relacionam diretamente com a atividade, mas sim com a entidade associativa `Laudo`. A certificadora avalia ("é verificado") o laudo emitido pelo auditor para garantir sua validade.
+* **Registra (Certificadores/Registradoras e Lote/Crédito):**
+    * Após a verificação positiva, a Certificadora registra e emite o `Lote/Crédito` de carbono.
+
+***
+
+**Uma dica extra para o seu trabalho universitário:**
+Para deixar o MER ainda mais completo e tirar nota máxima, defina as **cardinalidades** (1:1, 1:N, N:M) ao lado das linhas de cada relacionamento (ex: um projeto tem *N* atividades, mas uma atividade pertence a apenas *1* projeto). O seu desenho já traz as participações (linhas duplas), mas colocar os numerozinhos textualmente no seu documento reforçará o rigor do modelo! 
+
+Gostaria de ajuda para definir e descrever as cardinalidades exatas (1,N) de cada um desses relacionamentos com base na lógica de negócios de créditos de carbono?
