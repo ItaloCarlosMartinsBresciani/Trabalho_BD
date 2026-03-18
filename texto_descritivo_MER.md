@@ -22,7 +22,8 @@
 *No seu diagrama, elas aparecem como losangos dentro de retângulos. Elas ocorrem quando um relacionamento muitos-para-muitos (N:M) precisa se relacionar com outras entidades ou possuir atributos próprios.*
 
 * **Transação (relacionamento *Negocia*):** Representa o evento de compra e venda formalizado entre `Compradores` e `Originadores`. 
-* **Laudo (relacionamento *Audita*):** Representa o documento oficial e o processo em que uma `Atividade` é auditada por `Auditores`. 
+* **Laudo (relacionamento *Audita*):** Representa o documento oficial e o processo em que uma `Atividade` é auditada por `Auditores`.
+* **
 
 ---
 
@@ -46,5 +47,7 @@
     * As Certificadoras não se relacionam diretamente com a atividade, mas sim com a entidade associativa `Laudo`. A certificadora avalia ("é verificado") o laudo emitido pelo auditor para garantir sua validade.
 * **Registra (Certificadores/Registradoras e Lote/Crédito):**
     * Após a verificação positiva, a Certificadora registra e emite o `Lote/Crédito` de carbono.
+* **Possui (Lote/Crédito e Agentes de Mercado)***:
+    * O `Lote/Crédito` de carbono pode ser possuido por um agente de mercado.
 
 ***
