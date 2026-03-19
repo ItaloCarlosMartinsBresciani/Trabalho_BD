@@ -51,3 +51,23 @@
     * O `Lote/Crédito` de carbono pode ser possuido por um agente de mercado.
 
 ***
+---
+
+Atributos das Entidades: 
+
+* **Pessoa Jurídica (Super-tipo)**:
+   * `CNPJ` (Chave Primária): O identificador único e exclusivo.
+   * `Razao_Social`: essencial para contratos legais
+   * `Nome_Fantasia`: também essencial para contratos e para interface do sistema
+   * `Data_Cadastro`: data de cadastro da entidade no sistema.
+   * `Status_Atividade` (Ativo/Inativo): indica se a empresa está apta a operar (uma empresa banida não pode ser excluída do banco por questões de auditoria, apenas "inativada").
+
+* **Originadores (Sub-tipo)**:
+  * `Setor_Atuacao`: (Ex: Florestal, Energia Renovável, Agricultura). Importante para relatórios e para investidore que podem buscar comprar créditos de nichos específicos.
+  * `Capacidade_Tecnica_Comprovada`: Um documento que atesta que a ONG/Empresa tem permissão para atuar na área.
+
+* **Auditores (Sub-tipo):
+  * `Registro_Acreditação`: (Ex: Código de certificação ISO 14065). Prova legal que aquele auditor tem competência internacional para auditar carbono. Sem isso, o laudo não tem validade.
+  * `Data_Validade_Acreditacao`: Auditores perdem a licença. O sistema precisa bloquear laudos de auditores com licenças vencidas.
+ 
+* **Certificadores/Registradores (Sub-Tipo)** 
