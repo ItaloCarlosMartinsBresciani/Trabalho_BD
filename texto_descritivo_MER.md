@@ -70,4 +70,38 @@ Atributos das Entidades:
   * `Registro_Acreditação`: (Ex: Código de certificação ISO 14065). Prova legal que aquele auditor tem competência internacional para auditar carbono. Sem isso, o laudo não tem validade.
   * `Data_Validade_Acreditacao`: Auditores perdem a licença. O sistema precisa bloquear laudos de auditores com licenças vencidas.
  
-* **Certificadores/Registradores (Sub-Tipo)** 
+* **Certificadores/Registradoras (Sub-tipo)**:
+   * `Padrao_Certificacao`: (Ex: Verra, Gold Standard, CDM). Indica sob qual protocolo global essa entidade emite seus créditos. Isso afeta diretamente o valor de mercado do crédito de carbono, pois padrões mais rigorosos geram créditos mais caros.
+
+* **Compradores (Sub-tipo)**:
+   * `Perfil_Comprador`: (Ex: Investidor, Compensação). Define se a entidade está comprando para guardar e revender mais caro no futuro (especulação) ou para "aposentar" o crédito e abater sua própria poluição (compensação).
+   * `Volume_Estimado_Demanda`: Dado estratégico de vendas para o sistema entender o tamanho do cliente e sugerir projetos adequados.
+
+* **Projeto**:
+   * `ID_Projeto` (Chave Primária): Identificador único numérico ou alfanumérico do projeto no sistema.
+   * `Nome_Projeto`: O título comercial do projeto (Ex: "Reflorestamento Amazônia Legal Fase 1").
+   * `Coordenadas_Geograficas` (Latitude/Longitude ou Polígono georreferenciado): Extremamente vital no mercado de carbono para evitar a "dupla contagem" (garantir que dois projetos não estejam vendendo carbono do mesmo pedaço exato de terra).
+   * `Data_Inicio` e `Data_Fim_Prevista`: Delimita o ciclo de vida do projeto.
+   * `Metodologia_Aplicada`: Qual regra científica e matemática será usada para calcular o carbono (ex: ACM0002).
+
+* **Atividade**:
+   * `ID_Atividade` (Chave Primária): Identificador interno único da atividade.
+   * `Descricao_Atividade`: O que foi feito na prática (Ex: "Plantio de 10.000 mudas nativas no setor Norte").
+   * `Custo_Operacional`: Quanto custou a execução. Útil para o Originador calcular seu Retorno sobre Investimento (ROI).
+   * `Periodo_Execucao` (Data Inicio e Fim): Fundamental para que o auditor saiba o intervalo de tempo exato que ele deve focar sua análise.
+
+* **Lote/Crédito**:
+   * `ID_Lote` (Chave Primária): Identificador exclusivo do lote gerado.
+   * `Quantidade_Toneladas`: O "dinheiro" do sistema. Cada tonelada equivale a um crédito.
+   * `Ano_Geracao` (Vintage): O ano em que o carbono foi efetivamente capturado ou evitado. No mercado financeiro, créditos mais antigos costumam valer menos.
+   * `Status_Ciclo_Vida`: (Ex: Pendente, Emitido, Negociado, Aposentado). **Crítico:** Quando um comprador usa o crédito para compensar sua poluição, o crédito é "Aposentado" (Retired) e sai de circulação para sempre.
+
+* **Transação (Entidade Associativa proveniente de "Negocia")**:
+   * `ID_Transacao` (Chave Primária): Registro oficial e único do contrato de compra e venda.
+   * `Data_Hora_Transacao`: O momento exato (timestamp) da operação, vital para auditorias financeiras.
+   * `Valor_Unitario` e `Valor_Total`: O histórico financeiro. *Nota técnica:* O banco de dados precisa garantir precisão decimal aqui (geralmente usamos o tipo numérico `DECIMAL` em SQL, nunca `FLOAT`, para evitar erros de arredondamento com dinheiro real).
+
+* **Laudo (Entidade Associativa proveniente de "Audita")**:
+   * `ID_Laudo` (Chave Primária): Número de registro do documento de auditoria.
+   * `Parecer_Final`: (Ex: Aprovado, Reprovado, Necessita Correção). O resultado da auditoria.
+   * `Documento_Anexo`: O caminho (URL segura ou hash criptográfico) do arquivo PDF assinado digitalmente pelo auditor. Nunca salvamos o arquivo PDF inteiro dentro da tabela do banco de dados por questões de performance.
