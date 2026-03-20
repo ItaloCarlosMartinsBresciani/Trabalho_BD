@@ -78,30 +78,31 @@ Atributos das Entidades:
    * `Volume_Estimado_Demanda`: Dado estratégico de vendas para o sistema entender o tamanho do cliente e sugerir projetos adequados.
 
 * **Projeto**:
-   * `ID_Projeto` (Chave Primária): Identificador único numérico ou alfanumérico do projeto no sistema.
+   * `Numero_Licenca_Ambiental` (Chave Primária): Código alfanumérico oficial emitido pelo órgão governamental ou ambiental competente.
    * `Nome_Projeto`: O título comercial do projeto (Ex: "Reflorestamento Amazônia Legal Fase 1").
    * `Coordenadas_Geograficas` (Latitude/Longitude ou Polígono georreferenciado): Extremamente vital no mercado de carbono para evitar a "dupla contagem" (garantir que dois projetos não estejam vendendo carbono do mesmo pedaço exato de terra).
    * `Data_Inicio` e `Data_Fim_Prevista`: Delimita o ciclo de vida do projeto.
    * `Metodologia_Aplicada`: Qual regra científica e matemática será usada para calcular o carbono (ex: ACM0002).
 
 * **Atividade**:
-   * `ID_Atividade` (Chave Primária): Identificador interno único da atividade.
+   * `Codigo_Ordem_Servico` (Chave Primária): O código do documento técnico ou ordem de serviço que formaliza a execução daquela ação no mundo real.
+   * `Descricao_Atividade`: O que foi feito na prática (Ex: "Plantio de 10.000 mudas nativas no setor Norte").
    * `Descricao_Atividade`: O que foi feito na prática (Ex: "Plantio de 10.000 mudas nativas no setor Norte").
    * `Custo_Operacional`: Quanto custou a execução. Útil para o Originador calcular seu Retorno sobre Investimento (ROI).
    * `Periodo_Execucao` (Data Inicio e Fim): Fundamental para que o auditor saiba o intervalo de tempo exato que ele deve focar sua análise.
 
 * **Lote/Crédito**:
-   * `ID_Lote` (Chave Primária): Identificador exclusivo do lote gerado.
+   * `Número_Série_Registro` (Chave Primária): Identificador exclusivo do lote gerado.
    * `Quantidade_Toneladas`: O "dinheiro" do sistema. Cada tonelada equivale a um crédito.
    * `Ano_Geracao` (Vintage): O ano em que o carbono foi efetivamente capturado ou evitado. No mercado financeiro, créditos mais antigos costumam valer menos.
    * `Status_Ciclo_Vida`: (Ex: Pendente, Emitido, Negociado, Aposentado). **Crítico:** Quando um comprador usa o crédito para compensar sua poluição, o crédito é "Aposentado" (Retired) e sai de circulação para sempre.
 
 * **Transação (Entidade Associativa proveniente de "Negocia")**:
-   * `ID_Transacao` (Chave Primária): Registro oficial e único do contrato de compra e venda.
+   * `Nota_Fiscal` (Chave Primária): Registro oficial e único do contrato de compra e venda.
    * `Data_Hora_Transacao`: O momento exato (timestamp) da operação, vital para auditorias financeiras.
    * `Valor_Unitario` e `Valor_Total`: O histórico financeiro. *Nota técnica:* O banco de dados precisa garantir precisão decimal aqui (geralmente usamos o tipo numérico `DECIMAL` em SQL, nunca `FLOAT`, para evitar erros de arredondamento com dinheiro real).
 
 * **Laudo (Entidade Associativa proveniente de "Audita")**:
-   * `ID_Laudo` (Chave Primária): Número de registro do documento de auditoria.
+   * `Numero_Protocolo_Auditoria` (Chave Primária): Número de registro do documento de auditoria.
    * `Parecer_Final`: (Ex: Aprovado, Reprovado, Necessita Correção). O resultado da auditoria.
    * `Documento_Anexo`: O caminho (URL segura ou hash criptográfico) do arquivo PDF assinado digitalmente pelo auditor. Nunca salvamos o arquivo PDF inteiro dentro da tabela do banco de dados por questões de performance.
