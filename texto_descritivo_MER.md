@@ -105,3 +105,12 @@
 * **Histórico Preços (Entidade Fraca de Lote):** 
   * `Data` (Chave Secundária): Identificar a data da mudança do preço
   * `Preço`: Preço referente a esta data.
+
+---
+
+**Observações/Notas**
+
+* Uma empresa pode armazenar os endereços de sua sede e de suas filiais, por isso o uso do atributo multivalorado composto.
+* Um projeto representa um conjunto de atividades relacionadas à geração de créditos ambientais.
+* Assim que a empresa Certificadora registra um Lote novo, este deve ser atribuído a empresa originadora que o fez, sendo esta a primeira detentora deste Lote.
+* Para garantir a integridade referencial, o sistema implementará uma regra de automação (Trigger). No momento em que a Certificadora valida uma Atividade e registra o Crédito correspondente, o sistema identifica automaticamente o Originador responsável por aquela atividade e vincula-o como o detentor inicial do crédito a partir da relação Gera.
