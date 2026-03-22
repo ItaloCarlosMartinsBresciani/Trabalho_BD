@@ -82,7 +82,7 @@
   * `Perfil Comprador`: descreve o perfil do comprador
 
 * **Originador (Sub-tipo de Agente de Mercado):**
-  * `Setor Atuação`: descreve o perfil do comprador
+  * `Setor Atuação`: descreve a área de impacto ambiental do originador (ex: reflorestamento, energia limpa)
   * `Capacidade Tecnica`: documento comprobatório da capacidade técnica do originador para realizar atividades.
 
 * **Agente de Conformidade (Sub-tipo de Pessoa Juridica):**
