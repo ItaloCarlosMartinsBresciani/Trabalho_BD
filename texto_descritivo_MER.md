@@ -6,13 +6,13 @@
 
 * **Agentes de Mercado (Sub-tipo):** Empresas que operam financeiramente no sistema. Possuem **Especialização Sobreposta (O)**, permitindo que uma mesma empresa atue como Originadora e Compradora simultaneamente.
 
-* **Agentes de Conformidade (Sub-tipo):** Entidades reguladoras. Possuem **Especialização Disjunta (D)** entre Auditores e Certificadoras/Registradoras, garantindo a imparcialidade do processo.
+* **Agentes de Conformidade (Sub-tipo):** Entidades reguladoras. Possuem **Especialização Disjunta (D)** entre Auditor e Certificador, garantindo a imparcialidade do processo.
 
 **Projeto:** Iniciativa de mitigação ambiental (ex: reflorestamento, energia limpa) que serve como o agrupador das atividades de campo.
 
-**Atividade:** Ações específicas de execução (plantio, monitoramento). É modelada como uma **Entidade Fraca**, pois sua existência e identificação dependem do Projeto ao qual está vinculada.
+**Atividade:** Ações específicas de execução (plantio, monitoramento). As atividades podem ou não estarem contidas dentro de um projeto, isto porque uma empresa pode realizar atividades de forma avulsa sem que a mesma esteja envolvido com um projeto. 
 
-**Lote/Crédito:** A unidade certificada de carbono (tonelada de CO₂e). Representa o ativo financeiro gerado após a validação das atividades.
+**Crédito:** A unidade certificada de crédito de carbono. Representa o ativo financeiro gerado após a validação das atividades. Um Crédito tem um valor monetário e uma quantidade de CO2 (representa o quanto de CO2 deixou de ser emitido).
 
 ---
 
@@ -28,25 +28,25 @@
 
 **Relacionamentos:**
 
-* **Realiza (Originadores e Atividade):**
+* **Realiza (Originador e Atividade):**
   * Relacionamento muitos-para-muitos (N:M).
   * Um originador executa diversas atividades, e uma atividade pode envolver múltiplos parceiros técnicos.
 
 * **Contém (Projeto e Atividade):**
   * Relacionamento um-para-muitos (1:N).
   * Um projeto centraliza várias atividades.
-  * Participação total da Atividade: não existe atividade sem um projeto.
-
-* **Audita / Laudo (Auditores e Atividade):**
+  * Participação total do Projeto: não existe Projeto sem atividades. O pressu
+    
+* **Audita / Laudo (Auditor e Atividade):**
   * O auditor avalia a execução da atividade, gerando um laudo.
 
-* **Verifica (Certificadoras e Laudo):**
+* **Verifica (Certificador e Laudo):**
   * A certificadora não avalia diretamente a atividade, mas sim o laudo gerado pelo auditor.
 
-* **Registra (Certificadoras e Lote/Crédito):**
+* **Registra (Certificador e Lote/Crédito):**
   * Após verificação positiva, a certificadora emite e registra o lote.
 
-* **Negocia / Transação (Agentes de Mercado e Lote):**
+* **Negocia / Transação (Agente de Mercado e Lote):**
   * Evento onde a titularidade do lote é transferida.
   * O sistema usa esse relacionamento para determinar o proprietário atual.
 
@@ -60,13 +60,13 @@
   * `Endereço` (Atributo Composto): CEP, Estado e Rua.
   * `Status`: Indica se a instituição está apta a operar.
 
-* **Agentes de Mercado (Sub-tipo):**
-  * `Saldo` (Atributo Derivado): Calculado em tempo real com base no histórico da agregação Negocia.
+* **Agente de Mercado (Sub-tipo):**
+  * `SaldoCarbono` (Atributo Derivado): Calculado em tempo real com base no histórico da agregação Negocia.
 
-* **Auditores (Sub-tipo):**
-  * `Registro_Acreditação` / `Data_Validade`: Credenciais técnicas do auditor.
+* **Auditor (Sub-tipo):**
+  * `Registro_Acreditação` / `Data Validade Acreditação`: Credenciais técnicas do auditor.
 
-* **Certificadoras/Registradoras (Sub-tipo):**
+* **Certificador (Sub-tipo):**
   * `Padrão_Certificacao`: Protocolo internacional seguido (ex: Verra).
 
 * **Projeto:**
