@@ -1,4 +1,4 @@
-### Sistema de gerenciamento de créditos de carbono
+### Sistema de regulação de compra e venda de créditos de carbono
 
 **Entidades:**
 
@@ -61,7 +61,7 @@
   * `Status`: Indica se a instituição está apta a operar.
 
 * **Agente de Mercado (Sub-tipo):**
-  * `SaldoCarbono` (Atributo Derivado): Calculado em tempo real com base no histórico da agregação Negocia.
+  * `Tipo`: atributo para diferenciar Comprador/Originador
 
 * **Auditor (Sub-tipo):**
   * `Registro_Acreditação` / `Data Validade Acreditação`: Credenciais técnicas do auditor.
@@ -72,15 +72,20 @@
 * **Projeto:**
   * `Num_Licenca_Ambiental` (Chave Primária): Registro oficial governamental.
   * `Nome_Projeto` / `Metodologia_Aplicada`: Identificação comercial e técnica.
-  * `Data_Inicio` / `Data_Fim_Prevista`: Cronograma.
+  * `Data_Inicio` / `Data_Fim`: Cronograma.
+  * `Duração` (atributo derivado): obtido a partir de `Data Inicio` e `Data_Fim`
 
 * **Atividade:**
-  * `Codigo_Ordem_Servico` (Chave Parcial): Identificador dentro do projeto.
+  * `Codigo_Ordem_Servico` (Chave Primária): Identificador dentro do projeto.
   * `Custo_Operacional` / `Data_Execucao`: Dados de execução.
+  * `Data_Inicio` / `Data_Fim`: Cronograma.
+  * `Duração` (atributo derivado): obtido a partir de `Data Inicio` e `Data_Fim`
   * `Credito_Estimado`: Projeção de carbono.
 
-* **Lote/Crédito:**
+* **Crédito:**
   * `Num_Serie_Registro` (Chave Primária): Identificador global.
+  * `Valor do Cédito`: Valor estipulado para adquirir o crédito
+  * `Quantidade de CO2`: Quantidade de carbono que deixou de ser emitido.
   * `Ano_Geracao`: Ano da redução de emissão.
   * `Status_Ciclo_Vida`: (Pendente, Emitido, Aposentado).
 
