@@ -1,4 +1,4 @@
-### Sistema de regulação de compra e venda de créditos de carbono
+### CarbonTrack - Sistema de regulação de compra e venda de créditos de carbono
 
 **Entidades:**
 
