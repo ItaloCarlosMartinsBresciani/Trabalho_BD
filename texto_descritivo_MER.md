@@ -4,16 +4,17 @@
 
 **Pessoa Jurídica** (Entidade Supertipo): Entidade abstrata que centraliza os atributos comuns a todas as instituições. Possui uma **Especialização Total e Disjunta** (linha dupla + "D"). No sistema, uma instituição deve obrigatoriamente ser ou um Agente de Mercado ou um Agente de Conformidade.
 
-* **Agentes de Mercado (Sub-tipo):** Empresas que operam financeiramente no sistema. Possuem **Especialização Sobreposta (O)**, permitindo que uma mesma empresa atue como Originadora e Compradora simultaneamente.
+* **Agente de Mercado (Sub-tipo):** Empresas que operam financeiramente no sistema. Possuem **Especialização Sobreposta (O)**, permitindo que uma mesma empresa atue como Originadora e Compradora simultaneamente.
 
-* **Agentes de Conformidade (Sub-tipo):** Entidades reguladoras. Possuem **Especialização Disjunta (D)** entre Auditor e Certificador, garantindo a imparcialidade do processo.
+* **Agente de Conformidade (Sub-tipo):** Entidades reguladoras. Possuem **Especialização Disjunta (D)** entre Auditor e Certificador, garantindo a imparcialidade do processo.
 
-**Projeto:** Iniciativa de mitigação ambiental (ex: reflorestamento, energia limpa) que serve como o agrupador das atividades de campo.
+* **Projeto:** Iniciativa de mitigação ambiental (ex: reflorestamento, energia limpa) que serve como o agrupador das atividades de campo.
 
-**Atividade:** Ações específicas de execução (plantio, monitoramento). As atividades podem ou não estarem contidas dentro de um projeto, isto porque uma empresa pode realizar atividades de forma avulsa sem que a mesma esteja envolvido com um projeto. 
+* **Atividade:** Ações específicas de execução (plantio, monitoramento). As atividades podem ou não estarem contidas dentro de um projeto, isto porque uma empresa pode realizar atividades de forma avulsa sem que a mesma esteja envolvido com um projeto. 
 
-**Crédito:** A unidade certificada de crédito de carbono. Representa o ativo financeiro gerado após a validação das atividades. Um Crédito tem um valor monetário e uma quantidade de CO2 (representa o quanto de CO2 deixou de ser emitido).
+**Lote:** Conjunto certificado de créditos de carbono. Representa o ativo financeiro gerado após a validação das atividades. Um Lote tem um valor monetário e uma quantidade de créditos (representa o quanto de CO2 deixou de ser emitido).
 
+* **Histórico Preços (Entidade Fraca de Crédito):** Rastreia o histórico de preços de 
 ---
 
 **Entidades Associativas (Agregações):**
@@ -35,7 +36,7 @@
 * **Contém (Projeto e Atividade):**
   * Relacionamento um-para-muitos (1:N).
   * Um projeto centraliza várias atividades.
-  * Participação total do Projeto: não existe Projeto sem atividades. O pressu
+  * Participação total do Projeto: não existe Projeto sem atividades. O pressuposto é de que um projeto é cadastrado no sistema com atividades associadas
     
 * **Audita / Laudo (Auditor e Atividade):**
   * O auditor avalia a execução da atividade, gerando um laudo.
@@ -43,12 +44,16 @@
 * **Verifica (Certificador e Laudo):**
   * A certificadora não avalia diretamente a atividade, mas sim o laudo gerado pelo auditor.
 
-* **Registra (Certificador e Lote/Crédito):**
+* **Registra (Certificador e Lote):**
   * Após verificação positiva, a certificadora emite e registra o lote.
 
-* **Negocia / Transação (Agente de Mercado e Lote):**
+* **Negocia / Transação (entidade associativa)  (Agente de Mercado e Lote):**
   * Evento onde a titularidade do lote é transferida.
   * O sistema usa esse relacionamento para determinar o proprietário atual.
+ 
+* **Possui (Lote e Histórico Preços):**
+  * Relacionamento identificador para associar um lote de créditros a seu histórico de preços.
+  * Histórico Preços é entidade fraca de Lote.
 
 ---
 
@@ -82,10 +87,10 @@
   * `Duração` (atributo derivado): obtido a partir de `Data Inicio` e `Data_Fim`
   * `Credito_Estimado`: Projeção de carbono.
 
-* **Crédito:**
+* **Lote:**
   * `Num_Serie_Registro` (Chave Primária): Identificador global.
-  * `Valor do Cédito`: Valor estipulado para adquirir o crédito
-  * `Quantidade de CO2`: Quantidade de carbono que deixou de ser emitido.
+  * `Valor do Cédito`: Valor estipulado para adquirir o lote
+  * `Quantidade Créditos`: Quantidade de carbono que deixou de ser emitido em toneladas (1 tonelada de CO2 = 1 Crédito).
   * `Ano_Geracao`: Ano da redução de emissão.
   * `Status_Ciclo_Vida`: (Pendente, Emitido, Aposentado).
 
@@ -96,3 +101,7 @@
 * **Laudo (Agregação *Audita*):**
   * `Numero_Protocolo` (Chave Primária): Identificador do documento.
   * `Parecer_Final` / `Credito_Real`: Resultado técnico e quantidade validada.
+ 
+* **Histórico Preços (Entidade Fraca de Lote):** 
+  * `Data` (Chave Secundária): Identificar a data da mudança do preço
+  * `Preço`: Preço referente a esta data.
