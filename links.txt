@@ -1,1 +1,5 @@
-link do lucid chart: https://lucid.app/lucidchart/12017263-c5d7-4c61-9d5b-8c76af0a28c5/edit?invitationId=inv_138d2878-0881-4451-9745-49db1f85c639&page=0_0#
+Lucid Chart (MER): https://lucid.app/lucidchart/12017263-c5d7-4c61-9d5b-8c76af0a28c5/edit?invitationId=inv_138d2878-0881-4451-9745-49db1f85c639&page=0_0#
+
+Lucid Chart (Relacional): https://lucid.app/lucidchart/78f43ab5-e90c-4df3-b002-a0234e8a0e86/edit?invitationId=inv_c67610cd-2d7e-4b6e-a186-ebef91e3384d&page=0_0#
+
+
