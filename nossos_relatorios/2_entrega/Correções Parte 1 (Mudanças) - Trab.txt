@@ -1,0 +1,40 @@
+Correções Parte 1 (Mudanças) - Trabalho BD
+
+
+Antes da realização da segunda parte do projeto, algumas modificações foram feitas em relação à primeira entrega. São elas: 
+
+# Redução de termos técnicos Descrição geral (2.1) 
+
+Para facilitar a compreensão do sistema por um cliente leigo, fizemos a remoção ou alteração dos termos téc
+
+# Adição de Nota (N7) sobre Ciclo da Negociação (2.4) 
+
+Para garantir que haja uma restrição do sistema quanto a um Agente de Mercado não poder comprar lotes que já são dele, foi adicionado uma nota no MER para que isso seja tratado
+na camada de aplicação visto que essa restrição não pode ser garantida no MER.
+
+# Adição de um Conjunto de Relacionamento entre Lote e Atividade
+
+Antes, a origem do Lote era perdida pois não havia formas de recuperação da informação de qual Atividade originou o Lote. Para resolver isso, 
+adicionamos um CR Gera entre Atividade e Lote e removemos o antigo CR Gera que relacionas os Conjuntos de Entidades Originador e Lote mas que agora 
+não é mais cabível pois podemos rastrear o Originador do Lote a partir da Atividade. 
+
+# Detalhamento adicional da Nota (N4) sobre a automação (2.4) 
+
+Elevamos o nível de detalhamento da N4 para deixar claro que o sistema implementará um regra de automação para que, no momento em que a Certificadora Verifica uma Atividade e esta Gera um respectivo Lote, o sistema identifica o 
+dono inicial consultando o Originador responsável por Realizar essa Atividade. 
+
+# As notas N4 e N7 que abordam ciclos ficaram agora em uma seção específica de notas sobre ciclos para descrição mais extensa dos mesmos.
+
+# Quebra do Ternário do Conjunto de Relacionamentos Negocia 
+
+Optamos por substituir o relacionamento ternário Negocia (entre Agentes de Mercado e Lote) por uma modelagem mais modular. Agora, o relacionamento entre os Agentes de Mercado origina a agregação 
+Transação, que passa a se relacionar com Lote através do relacionamento Contém. Essa mudança foi necessária porque a Nota Fiscal (chave da Transação) não é apenas um identificador, mas representa 
+um evento fiscal independente que pode englobar múltiplos Lotes. Manter o modelo ternário limitaria a flexibilidade de representar transações com vários itens e geraria redundância de dados.
+
+# Melhorias de apresentação do MER
+
+Removemos as notas da imagem do MER pois elas já estão descritas textualmente na seção anterior. Além disso, rotacionamos a página que contém o MER
+para melhor visualização. 
+
+
+
