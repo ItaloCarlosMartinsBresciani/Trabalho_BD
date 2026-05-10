@@ -1,25 +1,3 @@
-Restrições de Relação e Restrições de Integridade
-
-Para que o banco de dados seja consistente com o mundo real, o SGBD deverá impor as 
-seguintes restrições: 
-1.  Restrição de Integridade de Entidade: 
-○  Nenhum atributo que faz parte de uma Chave Primária (PK) pode receber o 
-valor nulo (NULL). Logo, o CNPJ (em todas as tabelas) e as colunas da tabela 
-ENDERECO_PJ exigem as cláusulas PRIMARY KEY e NOT NULL 
-nativamente. 
-2.  Restrição de Integridade Referencial: 
-○  Garante que não existam "órfãos" no banco. Os atributos CNPJ nas subclasses 
-e na tabela de endereços são Chaves Estrangeiras (FK). Elas não podem 
-apontar para um CNPJ que não exista na tabela PESSOA_JURIDICA. 
-○  Ação de Disparo: Na tabela ENDERECO_PJ, a FK deve possuir a regra ON 
-DELETE CASCADE, pois se a empresa matriz for deletada, seus endereços 
-(que dependem totalmente da sua existência) devem ser excluídos 
-automaticamente. 
-3.  Restrições de Domínio: 
-○  O Status de Pessoa Jurídica deve possuir domínio restrito lógico (ex: 
-cláusula CHECK (Status IN ('Apto', 'Inapto')) ou tipo 
-Booleano).
-
 Justificativa 1 (J1): 
 
 Optamos pela criação de uma tabela Pessoa Juridica e uma tabela para cada subclasse dela, sendo o CNPJ a chave estrangeira das tabelas da subclasse. Essa opção foi escolhida porque se mapeássemos apenas as tabelas das subclasses, evitáriamos o custo de JOINs, entretanto, para mapear o atributo multivalorado ENDEREÇO, teríamos que criar duas tabelas independentes (uma referenciando a tabela dos agentes de mercado e outra para os de conformidade), gerendo redundância estrutural e dificultando consultas globais de cadastro. 
@@ -32,4 +10,15 @@ Endereço é um atributo composto e multivalorado por mermite que seja cadastrad
 
 A chave primária desta nova tabela passa a ser a combinação de todos esses atributos 
 (CNPJ, CEP, Estado, Rua).
+
+
+
+
+Nota 1 (N1) Integridade de Entidade: Atributos de Chave Primária (PK) não aceitam valores nulos. O CNPJ em todas as tabelas deve ser PRIMARY KEY e NOT NULL.
+
+Nota 2 (N2) Integridade Referencial: CNPJs em subclasses e endereços são Chaves Estrangeiras (FK). Aplica-se ON DELETE CASCADE para que a exclusão da Pessoa Jurídica remova automaticamente seus endereços e especializações.
+
+Nota 3 (N3) Restrição de Domínio: O campo Status da Pessoa Jurídica deve ter domínio restrito aos valores 'Apto' e 'Inapto' via cláusula CHECK.
+
+Nota 4 (N4) Especialização: Para garantir totalidade e disjunção (visto que o SGBD não impõe isso nativamente), deve-se usar Triggers ou lógica de aplicação para validar se o CNPJ pertence a apenas um dos subtipos.
 
