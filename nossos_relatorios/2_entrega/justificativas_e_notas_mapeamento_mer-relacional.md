@@ -40,7 +40,13 @@ O relacionamento Gera foi mapeado pela Técnica de Chave Estrangeira, inserindo 
 
 Optou-se por criar uma tabela AGENTE_CONFORMIDADE para a superclasse e tabelas distintas para cada subclasse, AUDITOR e CERTIFICADOR, com seus atributos específicos. O CNPJ é a chave primária de todas as tabelas e a FK das subclasses referencia sempre AGENTE_CONFORMIDADE. O atributo Atribuição, presente na tabela AGENTE_CONFORMIDADE, funciona como discriminador do tipo do agente, indicando se ele é Auditor ou Certificador, o que permite identificar a subclasse correspondente sem a necessidade de consultar as tabelas de subclasse diretamente. Diferentemente do mapeamento adotado para Agente de Mercado (J3), não foi criada uma tabela auxiliar de tipo, pois a especialização aqui é disjunta: cada agente pertence a exatamente uma subclasse, tornando desnecessário o controle de múltiplos papéis simultâneos. A desvantagem dessa abordagem é que, para recuperar o perfil completo de um agente, o SGBD precisará cruzar AGENTE_CONFORMIDADE com a tabela da subclasse correspondente. No entanto, o modelo relacional sozinho não garante nativamente nem a disjunção nem a totalidade da especialização, conforme tratado nas notas abaixo.
 
+### **Justificativa 9 (J9): Relacionamento N:N Transação-Lote:**
 
+O relacionamento entre Transação e Lote foi mapeado via tabela intermediária (Transação_Lote) devido à sua natureza Muitos-para-Muitos. Um lote pode ser objeto de múltiplas transações ao longo de seu ciclo de vida (vendas sucessivas entre agentes), e uma transação (nota fiscal única) pode englobar um conjunto de diferentes lotes.
+
+### **Justificativa 10 (J10): Atributo Derivado Duração**
+
+Optou-se por manter o atributo Duração nas tabelas Projeto e Atividade. Embora seja derivado das datas de início e fim, sua presença no modelo relacional visa facilitar a recuperação imediata de dados em consultas de auditoria, sem a necessidade de cálculos em tempo de execução no SGBD. E como se trata de um atributo que não passará por constantes atualizações, faz sentido deixá-lo como atributo.
 
 
 ---
@@ -60,7 +66,7 @@ antes de permitir a emissão do seu respectivo Laudo.
 | **N8** | **Garantia de Disjunção** | A disjunção é parcialmente garantida via DDL pela cláusula `CHECK` sobre o atributo `Atribuição`, restringindo seus valores a `'Auditor'` ou `'Certificador'`. Para reforçar a consistência, deve-se implementar uma **trigger BEFORE INSERT** em AUDITOR e CERTIFICADOR que verifique se o valor de `Atribuição` em AGENTE\_CONFORMIDADE corresponde à subclasse sendo inserida, abortando a operação caso haja divergência. Isso impede, por exemplo, que um CNPJ com `Atribuição = 'Certificador'` seja inserido na tabela AUDITOR. |
 | **N9** | **Garantia de Totalidade** | A totalidade não é garantida pelo DDL. Para impô-la, a camada de aplicação deve assegurar que toda inserção em AGENTE\_CONFORMIDADE seja acompanhada, na mesma transação, da inserção do respectivo registro em AUDITOR ou CERTIFICADOR conforme o valor de `Atribuição`. Dessa forma, nunca existirá um Agente de Conformidade sem subclasse correspondente. |
 | **N10** | **Integridade Temporal** | Tanto a tabela PROJETO quanto a tabela ATIVIDADE possuem os atributos `Data Início` e `Data Fim`. Para garantir que `Data Fim` nunca seja anterior a `Data Início`, deve-se aplicar a cláusula `CHECK (Data_Fim >= Data_Inicio)` no DDL de ambas as tabelas. Essa restrição é suportada nativamente pelos principais SGBDs relacionais e será verificada automaticamente em toda operação de `INSERT` ou `UPDATE`, dispensando validação exclusiva na camada de aplicação. Recomenda-se, no entanto, que a aplicação também valide essa regra antes de submeter a operação ao banco, oferecendo uma mensagem de erro mais amigável ao usuário. |
-
+| **N11** | **Cálculo de Atributo Derivado** | Para garantir a consistência do atributo `Duração` (mapeado fisicamente conforme J10), a implementação deve assegurar que seu valor seja sempre o reflexo fiel da diferença entre `Data Fim` e `Data Início`. Essa integridade deve ser mantida preferencialmente via **Triggers** (`BEFORE INSERT OR UPDATE`) no SGBD, que automatizam o recálculo sempre que houver alteração nas datas, ou através de lógica mandatória na camada de **Aplicação** antes da persistência. Isso evita que o banco armazene valores obsoletos ou divergentes das datas balizadoras caso uma atualização ocorra apenas parcialmente. |
 
 
 
