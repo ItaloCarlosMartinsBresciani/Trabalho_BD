@@ -1,0 +1,35 @@
+Restrições de Relação e Restrições de Integridade
+
+Para que o banco de dados seja consistente com o mundo real, o SGBD deverá impor as 
+seguintes restrições: 
+1.  Restrição de Integridade de Entidade: 
+○  Nenhum atributo que faz parte de uma Chave Primária (PK) pode receber o 
+valor nulo (NULL). Logo, o CNPJ (em todas as tabelas) e as colunas da tabela 
+ENDERECO_PJ exigem as cláusulas PRIMARY KEY e NOT NULL 
+nativamente. 
+2.  Restrição de Integridade Referencial: 
+○  Garante que não existam "órfãos" no banco. Os atributos CNPJ nas subclasses 
+e na tabela de endereços são Chaves Estrangeiras (FK). Elas não podem 
+apontar para um CNPJ que não exista na tabela PESSOA_JURIDICA. 
+○  Ação de Disparo: Na tabela ENDERECO_PJ, a FK deve possuir a regra ON 
+DELETE CASCADE, pois se a empresa matriz for deletada, seus endereços 
+(que dependem totalmente da sua existência) devem ser excluídos 
+automaticamente. 
+3.  Restrições de Domínio: 
+○  O Status de Pessoa Jurídica deve possuir domínio restrito lógico (ex: 
+cláusula CHECK (Status IN ('Apto', 'Inapto')) ou tipo 
+Booleano).
+
+Justificativa 1 (J1): 
+
+Optamos pela criação de uma tabela Pessoa Juridica e uma tabela para cada subclasse dela, sendo o CNPJ a chave estrangeira das tabelas da subclasse. Essa opção foi escolhida porque se mapeássemos apenas as tabelas das subclasses, evitáriamos o custo de JOINs, entretanto, para mapear o atributo multivalorado ENDEREÇO, teríamos que criar duas tabelas independentes (uma referenciando a tabela dos agentes de mercado e outra para os de conformidade), gerendo redundância estrutural e dificultando consultas globais de cadastro. 
+
+Uma outra alternativa seria criar apenas uma grande tabela Pessoa Juridica contendo todas as colunas das subclaswses e um discriminador (ex:Tipo_PJ) para saber a  qual sublasse pertence uma tupla. Como esta alternativa resultaria em muitos valores NULL nas tuplas decorrentes dos atributos específicios de cada subclasse, optamos por não seguir por este caminho. Além disso, a regra de negócio separa estritamente os pápeis do agente de conformidade e de mercado, o que geraria confusão caso seguíssemos essa alternativa. 
+
+Justificativa 2 (J2): 
+
+Endereço é um atributo composto e multivalorado por mermite que seja cadastrado endereços de sede e filiais da mesma Pessoa Jurídica, portanto, a única opção estrutural correta é criar uma nova relção Enderço que recebe os componentes simples do endereço e a chave primária da relação propriétaria (CNPJ). 
+
+A chave primária desta nova tabela passa a ser a combinação de todos esses atributos 
+(CNPJ, CEP, Estado, Rua).
+
