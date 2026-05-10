@@ -62,10 +62,5 @@ antes de permitir a emissão do seu respectivo Laudo.
 | **N10** | **Integridade Temporal** | Tanto a tabela PROJETO quanto a tabela ATIVIDADE possuem os atributos `Data Início` e `Data Fim`. Para garantir que `Data Fim` nunca seja anterior a `Data Início`, deve-se aplicar a cláusula `CHECK (Data_Fim >= Data_Inicio)` no DDL de ambas as tabelas. Essa restrição é suportada nativamente pelos principais SGBDs relacionais e será verificada automaticamente em toda operação de `INSERT` ou `UPDATE`, dispensando validação exclusiva na camada de aplicação. Recomenda-se, no entanto, que a aplicação também valide essa regra antes de submeter a operação ao banco, oferecendo uma mensagem de erro mais amigável ao usuário. |
 
 
-# Sobre Identificação do Proprietário Atual do Lote
-
-Optou-se por não introduzir redundância no modelo, seja na forma de um atributo derivado Proprietário ou de um relacionamento adicional entre Lote e Agente de Mercado. A identificação do proprietário atual de um Lote é obtida por inferência a partir de dois caminhos já existentes no modelo: caso o Lote possua negociações registradas, o proprietário corresponde ao comprador da transação mais recente; caso contrário, o proprietário é o Originador da Atividade que gerou o Lote. A principal desvantagem dessa abordagem é o custo computacional de realizar essa consulta com frequência em um cenário de alto volume de transações.
-Como alternativa, cogitou-se a criação de um relacionamento Possui (1:N) entre Agente de Mercado e Lote, o que tornaria o proprietário atual explícito no modelo e eliminaria a necessidade de inferência. Entretanto, essa alternativa introduz ciclos no modelo que precisam ser tratados com cuidado, representando uma potencial vulnerabilidade à inconsistência de dados caso as atualizações não sejam devidamente sincronizadas com os demais relacionamentos.
-
 
 

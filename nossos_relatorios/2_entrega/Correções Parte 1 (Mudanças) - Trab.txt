@@ -36,5 +36,8 @@ um evento fiscal independente que pode englobar múltiplos Lotes. Manter o model
 Removemos as notas da imagem do MER pois elas já estão descritas textualmente na seção anterior. Além disso, rotacionamos a página que contém o MER
 para melhor visualização. 
 
+# Sobre Identificação do Proprietário Atual do Lote
 
+Foi cogitada uma mudança no MER para tratar a identificação do propriétario atual do Lote. Como resultado, optou-se por não introduzir redundância no modelo, seja na forma de um atributo derivado Proprietário ou de um relacionamento adicional entre Lote e Agente de Mercado. A identificação do proprietário atual de um Lote é obtida por inferência a partir de dois caminhos já existentes no modelo: caso o Lote possua negociações registradas, o proprietário corresponde ao comprador da transação mais recente; caso contrário, o proprietário é o Originador da Atividade que gerou o Lote. A principal desvantagem dessa abordagem é o custo computacional de realizar essa consulta com frequência em um cenário de alto volume de transações.
+Como alternativa, cogitou-se a criação de um relacionamento Possui (1:N) entre Agente de Mercado e Lote, o que tornaria o proprietário atual explícito no modelo e eliminaria a necessidade de inferência. Entretanto, essa alternativa introduz ciclos no modelo que precisam ser tratados com cuidado, representando uma potencial vulnerabilidade à inconsistência de dados caso as atualizações não sejam devidamente sincronizadas com os demais relacionamentos.
 
