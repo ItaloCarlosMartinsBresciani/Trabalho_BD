@@ -40,13 +40,19 @@ O relacionamento Gera foi mapeado pela Técnica de Chave Estrangeira, inserindo 
 
 Optou-se por criar uma tabela AGENTE_CONFORMIDADE para a superclasse e tabelas distintas para cada subclasse, AUDITOR e CERTIFICADOR, com seus atributos específicos. O CNPJ é a chave primária de todas as tabelas e a FK das subclasses referencia sempre AGENTE_CONFORMIDADE. O atributo Atribuição, presente na tabela AGENTE_CONFORMIDADE, funciona como discriminador do tipo do agente, indicando se ele é Auditor ou Certificador, o que permite identificar a subclasse correspondente sem a necessidade de consultar as tabelas de subclasse diretamente. Diferentemente do mapeamento adotado para Agente de Mercado (J3), não foi criada uma tabela auxiliar de tipo, pois a especialização aqui é disjunta: cada agente pertence a exatamente uma subclasse, tornando desnecessário o controle de múltiplos papéis simultâneos. A desvantagem dessa abordagem é que, para recuperar o perfil completo de um agente, o SGBD precisará cruzar AGENTE_CONFORMIDADE com a tabela da subclasse correspondente. No entanto, o modelo relacional sozinho não garante nativamente nem a disjunção nem a totalidade da especialização, conforme tratado nas notas abaixo.
 
-### **Justificativa 9 (J9): Relacionamento N:N Transação-Lote:**
+### **Justificativa 9 (J9): Relacionamento N:N Transação-Lote**
 
-O relacionamento entre Transação e Lote foi mapeado via tabela intermediária (Transação_Lote) devido à sua natureza Muitos-para-Muitos. Um lote pode ser objeto de múltiplas transações ao longo de seu ciclo de vida (vendas sucessivas entre agentes), e uma transação (nota fiscal única) pode englobar um conjunto de diferentes lotes.
+O relacionamento entre Transação e Lote foi mapeado via tabela intermediária (`Transação_Lote`) devido à sua natureza Muitos-para-Muitos. Um Lote pode ser objeto de múltiplas transações ao longo de seu ciclo de vida (vendas sucessivas entre agentes), e uma única Transação (nota fiscal) pode englobar um conjunto de diferentes Lotes.
+
+Duas alternativas foram consideradas e descartadas. A primeira seria inserir uma FK de Transação diretamente na tabela `LOTE`: isso limitaria cada Lote a uma única transação, tornando impossível registrar o histórico de vendas sucessivas do ativo e destruindo a rastreabilidade do ciclo de vida. A segunda alternativa seria inserir uma FK de Lote diretamente na tabela `TRANSACAO`: isso restringiria cada nota fiscal a um único Lote, impedindo que uma negociação envolva múltiplos ativos simultaneamente, o que contraria diretamente a regra de negócio. A criação da tabela intermediária é, portanto, a única solução estruturalmente correta para essa cardinalidade, pois preserva ambas as direções do relacionamento sem redundância.
 
 ### **Justificativa 10 (J10): Atributo Derivado Duração**
 
-Optou-se por manter o atributo Duração nas tabelas Projeto e Atividade. Embora seja derivado das datas de início e fim, sua presença no modelo relacional visa facilitar a recuperação imediata de dados em consultas de auditoria, sem a necessidade de cálculos em tempo de execução no SGBD. E como se trata de um atributo que não passará por constantes atualizações, faz sentido deixá-lo como atributo.
+Optou-se por manter o atributo `Duração` fisicamente nas tabelas `PROJETO` e `ATIVIDADE`, ainda que seja derivado das datas de início e fim.
+
+Duas alternativas foram consideradas. A primeira seria **não armazenar o atributo**, calculando-o sempre em tempo de execução via expressão SQL (`Data_Fim - Data_Inicio`) a cada consulta. Essa abordagem elimina qualquer risco de inconsistência, mas impõe um custo computacional recorrente em consultas de auditoria que varrem grandes volumes de registros,  exatamente o caso de uso mais frequente do sistema. A segunda alternativa seria utilizar uma **coluna gerada**, recurso suportado pelo PostgreSQL, que manteria o valor atualizado automaticamente pelo SGBD sem intervenção de *triggers* ou aplicação. Embora tecnicamente elegante, essa solução introduz dependência de uma funcionalidade específica do SGBD, reduzindo a portabilidade do esquema.
+
+Optou-se pela persistência física do atributo por oferecer o melhor equilíbrio entre desempenho de leitura e simplicidade de implementação, dado que a `Duração` é determinada no cadastro e permanece estável enquanto as datas não forem alteradas. A consistência do valor é garantida por *triggers* ou pela camada de aplicação, conforme detalhado na Nota N11.
 
 
 ---
