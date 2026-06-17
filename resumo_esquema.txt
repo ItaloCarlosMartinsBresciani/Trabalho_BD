@@ -1,0 +1,28 @@
+Resumo
+16 tabelas (PostgreSQL), na ordem correta de dependência de FK, fiéis ao Modelo Relacional V4 e às justificativas/notas do .tex:
+
+Hierarquias de especialização
+
+PESSOA_JURIDICA (superclasse, com Funcao como discriminador — N3)
+AGENTE_MERCADO → ORIGINADOR, COMPRADOR + TIPO_AGENTE_MERCADO (papéis sobrepostos — J3)
+AGENTE_CONFORMIDADE → AUDITOR, CERTIFICADOR (disjunto, discriminador Atribuicao — J8)
+Operacional
+
+PROJETO, ATIVIDADE (absorve FKs de Originador/Projeto/Auditor — J4/J5), LAUDO (agregação Audita — J6)
+LOTE (relação Gera 1:1 via FK Atividade UNIQUE+NOT NULL — J7), HISTORICO_PRECO (entidade fraca)
+TRANSACAO + TRANSACAO_LOTE (N:N — J9), ENDERECO (multivalorado — J2)
+Restrições embutidas no DDL
+
+N1/N4: ON DELETE CASCADE nas subclasses e endereço
+N2: CHECK em Status (Apto/Inapto)
+N5: CHECK em Status_Ciclo_de_Vida (Disponível/Aposentado/Invalidado)
+N6: ON DELETE RESTRICT em ATIVIDADE.Originador
+N8: CHECK em Atribuicao
+N10: CHECK (Data_Fim >= Data_Inicio) em PROJETO e ATIVIDADE
+N7: ATIVIDADE.Auditor nasce nulo
+O que não é garantível por DDL puro (totalidade/disjunção das especializações — N3/N9, sincronização de TIPO_AGENTE_MERCADO — N5, recálculo de Duracao — N11) está marcado em comentários como responsabilidade de triggers/aplicação, conforme o relatório.
+
+Dois pontos onde tomei decisão por você (ajusto se preferir):
+
+Tipos de dados: CNPJ como VARCHAR(18), identificadores como VARCHAR(50), valores monetários NUMERIC(15,2). O modelo relacional não especifica tipos.
+ON DELETE de FKs opcionais: usei SET NULL para ATIVIDADE.Auditor, ATIVIDADE.Projeto e LAUDO.Certificador; RESTRICT onde a rastreabilidade exige preservar o vínculo.
