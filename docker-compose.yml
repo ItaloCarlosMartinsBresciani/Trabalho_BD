@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # Serviço 1: Nosso Banco de Dados PostgreSQL
+  postgres_db:
+    image: postgres:15
+    container_name: trabalho_bd_postgres
+    environment:
+      POSTGRES_USER: rapazinhos        # Usuário do banco
+      POSTGRES_PASSWORD: 1234    # Senha do banco
+      POSTGRES_DB: CarbonTrack     # Nome do banco de dados
+    ports:
+      - "5432:5432"               # Expõe a porta para você conectar de fora
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Salva os dados para não sumirem se o container parar
+
+  # Serviço 2: pgAdmin (Interface visual)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: trabalho_bd_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"                 # Acessível no seu navegador via localhost:5050
+    depends_on:
+      - postgres_db
+
+volumes:
+  postgres_data:
