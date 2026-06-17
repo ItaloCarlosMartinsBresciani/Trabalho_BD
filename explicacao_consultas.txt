@@ -1,0 +1,17 @@
+C1 — Rastreabilidade Completa de Lote ALTA
+7 JOINs (internos + LEFT JOIN). Dado um Num_Serie_Registro, retorna toda a cadeia: Atividade → Projeto → Originador → Auditor → Laudo → Certificador → última Transação. LEFT JOIN nos relacionamentos opcionais garante que lotes ainda não auditados/negociados também apareçam.
+
+C2 — Desempenho de Projetos MÉDIA
+GROUP BY + SUM/COUNT + LEFT JOIN. Agrupa por Projeto mostrando total de créditos (tCO₂e), valor financeiro total dos Lotes e número de transações. LEFT JOIN inclui projetos sem lotes emitidos com zeros.
+
+C3 — Atividades Finalizadas sem Laudo MÉDIA
+Subconsulta não-correlacionada (NOT IN). Identifica Atividades com Data_Fim < hoje que não têm nenhum registro em LAUDO — risco de inadimplência de conformidade.
+
+C4 — Evolução de Preço com Variação Percentual MÉDIA/ALTA
+Função de janela LAG(). Série histórica de preços de um Lote com variação absoluta e percentual em relação ao registro anterior. NULLIF evita divisão por zero; a cláusula WINDOW evita o auto-JOIN sobre HISTORICO_PRECO.
+
+C5 — Divisão Relacional ✦ obrigatória ALTA
+Dupla negação (NOT EXISTS aninhado). Implementa ORIGINADOR ÷ CERT_ATIVAS: retorna os Originadores que têm Laudos emitidos por todas as Certificadoras ativas. O padrão NOT EXISTS (... AND NOT EXISTS (...)) é a tradução direta do quantificador universal ∀ sem materializar produto cartesiano.
+
+C6 — Proprietário Atual de Cada Lote Disponível ALTA
+Subconsulta correlacionada no SELECT + COALESCE. Implementa a regra de inferência de posse do MER (decisão arquitetural da seção 2.3): se há transações → dono = comprador da mais recente; senão → dono = Originador inicial. DISTINCT ON + ORDER BY Data_Hora DESC encontra a transação mais recente com custo O(log n) por índice de FK.
