@@ -28,13 +28,13 @@ BEGIN;
 --    7 instituições: 3 de mercado + 4 de conformidade.
 -- ----------------------------------------------------------------------------
 INSERT INTO PESSOA_JURIDICA (CNPJ, Nome_Fantasia, Razao_Social, Status, Funcao) VALUES
-    ('11.111.111/0001-11', 'EcoFlorestas',    'EcoFlorestas Reflorestamento S.A.',        'Apto',   'Mercado'),
-    ('22.222.222/0001-22', 'AeroBrasil',       'AeroBrasil Linhas Aéreas Ltda.',           'Apto',   'Mercado'),
-    ('33.333.333/0001-33', 'VerdeAgro',        'VerdeAgro Agronegócios e Compensação S.A.','Apto',   'Mercado'),
-    ('44.444.444/0001-44', 'AuditCarbon',      'AuditCarbon Verificações Ambientais Ltda.','Apto',   'Conformidade'),
-    ('55.555.555/0001-55', 'Verra Brasil',     'Verra Standard Brasil Certificadora S.A.', 'Apto',   'Conformidade'),
-    ('66.666.666/0001-66', 'GreenAudit',       'GreenAudit Inspeções Técnicas Ltda.',      'Apto',   'Conformidade'),
-    ('77.777.777/0001-77', 'GoldStandard BR',  'Gold Standard Certificação Brasil S.A.',   'Inapto', 'Conformidade');
+    ('11.111.111/0001-11', 'EcoFlorestas',    'EcoFlorestas Reflorestamento S.A.',        'Apto',   'Agente de Mercado'),
+    ('22.222.222/0001-22', 'AeroBrasil',       'AeroBrasil Linhas Aéreas Ltda.',           'Apto',   'Agente de Mercado'),
+    ('33.333.333/0001-33', 'VerdeAgro',        'VerdeAgro Agronegócios e Compensação S.A.','Apto',   'Agente de Mercado'),
+    ('44.444.444/0001-44', 'AuditCarbon',      'AuditCarbon Verificações Ambientais Ltda.','Apto',   'Agente de Conformidade'),
+    ('55.555.555/0001-55', 'Verra Brasil',     'Verra Standard Brasil Certificadora S.A.', 'Apto',   'Agente de Conformidade'),
+    ('66.666.666/0001-66', 'GreenAudit',       'GreenAudit Inspeções Técnicas Ltda.',      'Apto',   'Agente de Conformidade'),
+    ('77.777.777/0001-77', 'GoldStandard BR',  'Gold Standard Certificação Brasil S.A.',   'Inapto', 'Agente de Conformidade');
 
 -- ----------------------------------------------------------------------------
 -- 2) ENDERECO (atributo composto multivalorado -- J2)
@@ -77,12 +77,14 @@ INSERT INTO COMPRADOR (CNPJ, Perfil_Comprador) VALUES
 -- ----------------------------------------------------------------------------
 -- 6) TIPO_AGENTE_MERCADO (papéis sobrepostos -- J3)
 --    Reflete a especialização sobreposta: PJ '33...' aparece nos dois papéis.
+--    NOTA: Inserção comentada pois o arquivo triggers.sql agora cuida disso
+--    automaticamente ao inserir nas tabelas ORIGINADOR e COMPRADOR.
 -- ----------------------------------------------------------------------------
-INSERT INTO TIPO_AGENTE_MERCADO (CNPJ, Tipo) VALUES
-    ('11.111.111/0001-11', 'Originador'),
-    ('22.222.222/0001-22', 'Comprador'),
-    ('33.333.333/0001-33', 'Originador'),
-    ('33.333.333/0001-33', 'Comprador');
+-- INSERT INTO TIPO_AGENTE_MERCADO (CNPJ, Tipo) VALUES
+--     ('11.111.111/0001-11', 'Originador'),
+--     ('22.222.222/0001-22', 'Comprador'),
+--     ('33.333.333/0001-33', 'Originador'),
+--     ('33.333.333/0001-33', 'Comprador');
 
 -- ----------------------------------------------------------------------------
 -- 7) AGENTE_CONFORMIDADE (subclasse de Pessoa Jurídica)

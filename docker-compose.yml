@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: 1234    # Senha do banco
       POSTGRES_DB: CarbonTrack     # Nome do banco de dados
     ports:
-      - "5432:5432"               # Expõe a porta para você conectar de fora
+      - "5433:5432"               # Expõe a porta 5433 para não conflitar com banco local
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Salva os dados para não sumirem se o container parar
 

@@ -335,10 +335,10 @@ class CarbonTrackApp(tk.Tk):
         frame.pack(fill="x")
 
         self.var_host = tk.StringVar(value="localhost")
-        self.var_port = tk.StringVar(value="5432")
-        self.var_db   = tk.StringVar(value="carbontrack")
-        self.var_user = tk.StringVar(value="postgres")
-        self.var_pass = tk.StringVar(value="")
+        self.var_port = tk.StringVar(value="5433")
+        self.var_db   = tk.StringVar(value="CarbonTrack")
+        self.var_user = tk.StringVar(value="rapazinhos")
+        self.var_pass = tk.StringVar(value="1234")
 
         campos = [
             ("Host", self.var_host, 12),
@@ -414,7 +414,7 @@ class CarbonTrackApp(tk.Tk):
                   style="Secao.TLabel").grid(row=0, column=0, columnspan=2,
                                              sticky="w", pady=(0, 4))
         ttk.Label(master, text="O Originador é obrigatório; Projeto é opcional. "
-                  "O Auditor nasce vazio e é vinculado depois (N7).").grid(
+                  "O Auditor nasce vazio e é vinculado depois.").grid(
                   row=1, column=0, columnspan=2, sticky="w", pady=(0, 14))
 
         self.a_cod    = tk.StringVar()

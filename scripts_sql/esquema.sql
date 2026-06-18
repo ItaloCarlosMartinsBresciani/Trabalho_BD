@@ -47,12 +47,14 @@ CREATE TABLE PESSOA_JURIDICA (
     Nome_Fantasia VARCHAR(255) NOT NULL,
     Razao_Social  VARCHAR(255) NOT NULL,
     Status        VARCHAR(10)  NOT NULL,
-    Funcao        VARCHAR(20),
+    Funcao        VARCHAR(25)  NOT NULL,
 
     CONSTRAINT pk_pessoa_juridica PRIMARY KEY (CNPJ),
     CONSTRAINT ck_pj_cnpj         CHECK (CNPJ   ~ '^[0-9]{2}\.[0-9]{3}\.[0-9]{3}/[0-9]{4}-[0-9]{2}$'),
     -- N2: domínio restrito de Status
-    CONSTRAINT ck_pj_status       CHECK (Status IN ('Apto', 'Inapto'))
+    CONSTRAINT ck_pj_status       CHECK (Status IN ('Apto', 'Inapto')),
+    -- Discriminador da especialização (Total e Disjunta)
+    CONSTRAINT ck_funcao          CHECK (UPPER(Funcao) IN ('AGENTE DE MERCADO', 'AGENTE DE CONFORMIDADE'))
 );
 
 -- ============================================================================
