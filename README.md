@@ -3,19 +3,15 @@
 ## Estrutura do repositório
 
 - `docker-compose.yml`: arquivo de configuração do ambiente Docker contendo o banco de dados PostgreSQL e a interface pgAdmin.
-- `links_importantes.txt`: lista de links úteis para o trabalho.
 - `README.md`: descrição geral do repositório.
-- `texto_descritivo_MER_(desatualizado).md`: texto descritivo do MER (arquivo antigo/desatualizado).
-- `scripts_sql/`: pasta contendo os scripts SQL para a criação das tabelas (`esquema.sql`), inserção dos dados (`dados.sql`) e relatórios/queries (`consultas.sql`).
-- `nossos_relatorios/`: relatórios da 1a entrega (com feedback) e da 2a entrega (em andamento).
-  - `1_entrega/`: materiais da primeira entrega.
-  - `2_entrega/`: materiais da segunda entrega.
-    - Correções Parte 1 (Mudanças) - Trab.txt: explica as mudanças feitas.
-    - Decisoes e vantagens.pdf: documento com justificativas do mapeamento do MER para o Relacional.
-    - imagem do modelo relacional
-    - V1 do relatório com correções da parte 1, modelo relacional e justificativas e notas do mapeamento.
-- `pdf's_base/`: arquivos fornecidos pela professora Elaine que ajudam a guiar o trabalho.
-  - `projetos_antigos/`: exemplos e projetos de turmas anteriores.
+- `scripts_sql/`: pasta contendo os scripts SQL para a criação das tabelas (`esquema.sql`), inserção dos dados (`dados.sql`), relatórios/queries (`consultas.sql`), além de explicações e resumos complementares.
+- `entregaveis_contexto/`: pasta que agrupa os documentos contextuais e relatórios de entregas do projeto.
+  - `links_importantes.txt`: lista de links úteis para o trabalho.
+  - `nossos_relatorios/`: relatórios da 1ª entrega (com feedback) e da 2ª entrega (em andamento).
+    - `1_entrega/`: materiais da primeira entrega.
+    - `2_entrega/`: materiais da segunda entrega (contendo histórico de correções, justificativas de mapeamento, imagem do modelo relacional, etc.).
+  - `pdf's_base/`: arquivos fornecidos para guiar o trabalho.
+    - `projetos_antigos/`: exemplos de projetos de turmas anteriores.
 
 ---
 
