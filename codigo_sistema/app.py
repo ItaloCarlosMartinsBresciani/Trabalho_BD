@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
 # ============================================================================
 # CarbonTrack - Sistema de Rastreabilidade para Créditos de Carbono
 # Protótipo operacional (interface gráfica desktop)
 #
 # SGBD alvo: PostgreSQL
-# Pré-requisitos no banco: executar antes esquema.sql e (opcional) dados.sql.
+# Pré-requisitos no banco: executar antes esquema.sql e dados.sql.
 #
 # Bibliotecas:
 #   * tkinter / ttk  -> interface gráfica nativa (janela de aplicativo desktop)
-#   * psycopg2       -> driver de conexão com o PostgreSQL
-#       Instale com:  pip install psycopg2-binary
+#   * psycopg2       ->  driver de conexão com o PostgreSQL
+#       Instale com:  pip install -r requirements.txt
 #
 # Funcionalidades implementadas (atendendo ao enunciado):
 #   (a) CADASTRO de dados: inserção em PROJETO e em ATIVIDADE, com validação
@@ -34,9 +33,9 @@ except ImportError:  # pragma: no cover
 
 
 # ----------------------------------------------------------------------------
-# Paleta de cores e fontes (visual agradável e consistente)
+# Paleta de cores e fontes # verde escuro (tema "carbono/floresta")
 # ----------------------------------------------------------------------------
-COR_PRIMARIA   = "#1b5e20"   # verde escuro (tema "carbono/floresta")
+COR_PRIMARIA   = "#1b5e20"   
 COR_SECUNDARIA = "#2e7d32"
 COR_FUNDO      = "#f4f6f4"
 COR_CARTAO     = "#ffffff"
@@ -288,7 +287,7 @@ class CarbonTrackApp(tk.Tk):
         if psycopg2 is None:
             self.after(300, self._avisar_sem_driver)
 
-    # ------------------------------------------------------------------ estilo
+    # --- estilo
     def _configurar_estilo(self):
         style = ttk.Style(self)
         try:
@@ -318,18 +317,18 @@ class CarbonTrackApp(tk.Tk):
         style.configure("TNotebook", background=COR_FUNDO, borderwidth=0)
         style.configure("TNotebook.Tab", font=("Segoe UI", 10, "bold"), padding=(14, 8))
 
-    # --------------------------------------------------------------- cabeçalho
+    # --- cabeçalho
     def _construir_cabecalho(self):
         header = tk.Frame(self, bg=COR_PRIMARIA, height=70)
         header.pack(fill="x")
         header.pack_propagate(False)
-        tk.Label(header, text="🌱  CarbonTrack", bg=COR_PRIMARIA, fg="white",
+        tk.Label(header, text=" CarbonTrack", bg=COR_PRIMARIA, fg="white",
                  font=FONTE_TITULO).pack(side="left", padx=20)
         tk.Label(header, text="Sistema de Rastreabilidade para Créditos de Carbono",
                  bg=COR_PRIMARIA, fg="#c8e6c9", font=FONTE_SUBTIT).pack(
                  side="left", padx=4, pady=24)
 
-    # ---------------------------------------------------------- barra conexão
+    # --- barra conexão
     def _construir_barra_conexao(self):
         frame = ttk.Frame(self, padding=(12, 10))
         frame.pack(fill="x")
@@ -364,7 +363,7 @@ class CarbonTrackApp(tk.Tk):
                                      style="Bar.TLabel", foreground=COR_ERRO)
         self.lbl_conexao.pack(side="right", padx=8)
 
-    # ------------------------------------------------------------ aba cadastro
+    # --- aba cadastro
     def _construir_aba_cadastro(self):
         sub = ttk.Notebook(self.aba_cadastro)
         sub.pack(fill="both", expand=True, padx=14, pady=14)
@@ -377,7 +376,7 @@ class CarbonTrackApp(tk.Tk):
         self._form_projeto(self.frame_proj)
         self._form_atividade(self.frame_atv)
 
-    # ---- formulário de Projeto ----
+    # ---- formulário de Projeto 
     def _form_projeto(self, master):
         ttk.Label(master, text="Cadastro de Projeto de Mitigação",
                   style="Secao.TLabel").grid(row=0, column=0, columnspan=2,
@@ -408,7 +407,7 @@ class CarbonTrackApp(tk.Tk):
                    [self.p_num, self.p_nome, self.p_ini, self.p_fim, self.p_metod])
                    ).grid(row=2 + len(linhas), column=0, sticky="w", pady=(18, 0))
 
-    # ---- formulário de Atividade ----
+    # ---- formulário de Atividade 
     def _form_atividade(self, master):
         ttk.Label(master, text="Cadastro de Atividade de Campo",
                   style="Secao.TLabel").grid(row=0, column=0, columnspan=2,
@@ -465,7 +464,7 @@ class CarbonTrackApp(tk.Tk):
                 ttk.Label(master, text=dica, foreground="#888").grid(
                     row=r, column=2, sticky="w", padx=8)
 
-    # ------------------------------------------------------------ aba consulta
+    # --- aba consulta
     def _construir_aba_consulta(self):
         topo = ttk.Frame(self.aba_consulta, style="Card.TFrame", padding=(16, 16, 16, 6))
         topo.pack(fill="x")
@@ -525,7 +524,7 @@ class CarbonTrackApp(tk.Tk):
                 side="left", padx=(0, 16))
             self.param_vars.append(var)
 
-    # ----------------------------------------------------------- barra status
+    # --- barra status
     def _construir_barra_status(self):
         self.status = tk.Label(self, text="Pronto.", bg="#e8eee8", fg=COR_TEXTO,
                                anchor="w", font=("Segoe UI", 9), padx=10)
@@ -534,7 +533,7 @@ class CarbonTrackApp(tk.Tk):
     def _set_status(self, texto, erro=False):
         self.status.config(text=texto, fg=COR_ERRO if erro else COR_TEXTO)
 
-    # ======================================================= conexão ao banco
+    # === conexão ao banco
     def _avisar_sem_driver(self):
         messagebox.showwarning(
             "Driver ausente",
@@ -612,7 +611,7 @@ class CarbonTrackApp(tk.Tk):
             self.conn.rollback()
             self._set_status(f"Erro ao carregar listas: {exc}", erro=True)
 
-    # ===================================================== validações comuns
+    # === validações comuns
     @staticmethod
     def _parse_data(texto, obrigatorio, nome_campo):
         texto = (texto or "").strip()
@@ -655,7 +654,7 @@ class CarbonTrackApp(tk.Tk):
         messagebox.showerror("Erro no banco de dados", msg)
         self._set_status("Operação não concluída (erro no banco).", erro=True)
 
-    # ===================================================== cadastro: projeto
+    # === cadastro: projeto
     def cadastrar_projeto(self):
         if not self._exige_conexao():
             return
@@ -750,7 +749,7 @@ class CarbonTrackApp(tk.Tk):
         except Exception as exc:
             self._tratar_erro_banco(exc)
 
-    # ===================================================== execução consulta
+    # === execução consulta
     def executar_consulta(self):
         if not self._exige_conexao():
             return
@@ -795,7 +794,7 @@ class CarbonTrackApp(tk.Tk):
         self.tree.tag_configure("impar", background="#f0f5f0")
         self.tree.tag_configure("par", background="white")
 
-    # --------------------------------------------------------------- utilidade
+    # --- utilidade
     @staticmethod
     def _limpar(variaveis):
         for v in variaveis:
