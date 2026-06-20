@@ -3,44 +3,29 @@
 -- Script de Consultas ao Banco de Dados (DQL)
 --
 -- SGBD alvo: PostgreSQL
--- Pré-requisito: executar antes esquema.sql e dados.sql.
+-- Pré-requisito: executar antes esquema.sql e dados.sql para prepara o banco de dados.
+-- Foram implementadas 6 consultas:
 --
--- Consultas implementadas (6 no total, mínimo exigido = 5):
+--   A primeira : Rastreabilidade Completa de Lote com múltiplos JOINs internos e externos (LEFT JOIN)
+--       
 --
---   C1  Rastreabilidade Completa de Lote
---       Tipo: múltiplos JOINs internos e externos (LEFT JOIN)
---       Complexidade: ALTA
+--   Segunda: Desempenho de Projetos por Créditos e Valor Financeiro atraves de agrupamento (GROUP BY) com funções de agregação + LEFT JOIN
+--  
+--   Terceira: Atividades Finalizadas sem Laudo de Auditoria atraves de subconsulta NÃO-CORRELACIONADA (NOT IN) + JOIN
 --
---   C2  Desempenho de Projetos por Créditos e Valor Financeiro
---       Tipo: agrupamento (GROUP BY) com funções de agregação + LEFT JOIN
---       Complexidade: MÉDIA
+--   Quarta: Evolução de Preço de um Lote com Variação Percentual, feita por função de janela (LAG) sobre resultado filtrado
 --
---   C3  Atividades Finalizadas sem Laudo de Auditoria
---       Tipo: subconsulta NÃO-CORRELACIONADA (NOT IN) + JOIN
---       Complexidade: MÉDIA
---
---   C4  Evolução de Preço de um Lote com Variação Percentual
---       Tipo: função de janela (LAG) sobre resultado filtrado
---       Complexidade: MÉDIA / ALTA
---
---   C5  Divisão Relacional: Originadores aprovados por TODAS as
---       Certificadoras ativas
---       Tipo: DIVISÃO RELACIONAL via dupla negação (NOT EXISTS aninhado)
---       Complexidade: ALTA  ← obrigatória pelo enunciado
---
---   C6  Proprietário Atual de Cada Lote Disponível
---       Tipo: subconsulta CORRELACIONADA no SELECT + COALESCE
---       Complexidade: ALTA
+--   Quinta: Divisão Relacional: Originadores aprovados por TODAS as Certificadoras ativas, DIVISÃO RELACIONAL via dupla negação (NOT EXISTS aninhado)
+--   
+--   Sexta:  Proprietário Atual de Cada Lote Disponível, subconsulta CORRELACIONADA no SELECT + COALESCE
+--   
 --
 -- Critérios de eficiência adotados:
---   * Filtros sobre colunas de PK/FK (sempre indexadas) aplicados cedo.
---   * NOT EXISTS preferido a NOT IN em colunas anuláveis (evita armadilha
---     do NULL que torna NOT IN sempre falso).
---   * LIMIT 1 na subconsulta correlacionada de C6 interrompe a varredura
---     assim que o registro mais recente é encontrado.
---   * LAG() em C4 evita o auto-JOIN sobre HISTORICO_PRECO.
---   * CTEs (WITH) em C1 e C6 reduzem repetição e permitem ao otimizador
---     materializar resultados intermediários.
+--   Filtros sobre colunas de PK/FK (sempre indexadas) aplicados cedo.
+--   NOT EXISTS preferido a NOT IN em colunas anuláveis (evita armadilha do NULL que torna NOT IN sempre falso).
+--   LIMIT 1 na subconsulta correlacionada de C6 interrompe a varredura assim que o registro mais recente é encontrado.
+--   LAG() em C4 evita o auto-JOIN sobre HISTORICO_PRECO.
+--   CTEs (WITH) em C1 e C6 reduzem repetição e permitem ao otimizador materializar resultados intermediários.
 -- ============================================================================
 
 
@@ -58,7 +43,7 @@
 -- ============================================================================
 
 WITH ultima_transacao AS (
-    -- Subconsulta não-correlacionada: isola a transação mais recente por lote
+    -- Subconsulta não-correlacionada que isola a transação mais recente por lote
     SELECT DISTINCT ON (tl.Lote)
         tl.Lote                       AS num_serie,
         t.Nota_Fiscal,
@@ -83,18 +68,18 @@ SELECT
     a.Codigo_Ordem_Servico           AS atividade,
     a.Descricao_Atividade,
 
-    -- Projeto (opcional)
+    -- Projeto
     p.Nome_Projeto,
     p.Metodologia_Aplicada,
 
     -- Originador da atividade
     pj_orig.Nome_Fantasia            AS originador,
 
-    -- Auditor (opcional: atividade pode não ter sido auditada)
+    -- Auditor (atividade pode não ter sido auditada)
     pj_aud.Nome_Fantasia             AS auditor,
     aud.Registro_Acreditacao,
 
-    -- Laudo e Certificador (opcional)
+    -- Laudo e Certificador
     ld.Numero_do_Protocolo,
     ld.Parecer_Final,
     pj_cert.Nome_Fantasia            AS certificador,
@@ -107,7 +92,7 @@ SELECT
     ut.comprador_atual
 
 FROM LOTE l
--- Atividade que gerou o lote (1:1 obrigatório)
+-- Atividade que gerou o lote (1:1)
 JOIN  ATIVIDADE      a       ON l.Atividade     = a.Codigo_Ordem_Servico
 -- Originador da atividade
 JOIN  ORIGINADOR     orig    ON a.Originador     = orig.CNPJ
