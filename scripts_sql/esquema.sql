@@ -207,11 +207,11 @@ CREATE TABLE ATIVIDADE (
     Projeto              VARCHAR(50),
     Auditor              VARCHAR(18),
     Descricao_Atividade  TEXT,
-    Custo_Operacional    NUMERIC(15,2),
+    Custo_Operacional    NUMERIC(15,2) NOT NULL,
     Data_Inicio          DATE          NOT NULL,
     Data_Fim             DATE,
     Duracao              INTEGER,
-    Credito_Estimado     NUMERIC(15,2),
+    Credito_Estimado     NUMERIC(15,2) NOT NULL,
 
     CONSTRAINT pk_atividade            PRIMARY KEY (Codigo_Ordem_Servico),
     CONSTRAINT fk_atividade_originador FOREIGN KEY (Originador)
@@ -234,7 +234,7 @@ CREATE TABLE LOTE (
     Num_Serie_Registro    VARCHAR(50)   NOT NULL,
     Valor                 NUMERIC(15,2),
     Quantidade_de_Credito NUMERIC(15,2) NOT NULL,
-    Ano_Geracao           INTEGER,
+    Ano_Geracao           INTEGER NOT NULL,
     Status_Ciclo_de_Vida  VARCHAR(15)   NOT NULL,
     Atividade             VARCHAR(50)   NOT NULL,
 
@@ -272,7 +272,7 @@ CREATE TABLE LAUDO (
     Parecer_Final       TEXT,
     URL_do_Documento    VARCHAR(500),
     Credito_Real        NUMERIC(15,2),
-    Certificador        VARCHAR(18),
+    Certificador        VARCHAR(18) NOT NULL,
 
     CONSTRAINT pk_laudo              PRIMARY KEY (Numero_do_Protocolo),
     CONSTRAINT fk_laudo_atividade    FOREIGN KEY (Atividade)
@@ -292,7 +292,7 @@ CREATE TABLE TRANSACAO (
     Agente_Mercado_Vendedor  VARCHAR(18)  NOT NULL,
     Agente_Mercado_Comprador VARCHAR(18)  NOT NULL,
     Data_Hora                TIMESTAMP    NOT NULL,
-    Valor                    NUMERIC(15,2),
+    Valor                    NUMERIC(15,2) NOT NULL, -- alterado para NOT NULL
 
     CONSTRAINT pk_transacao           PRIMARY KEY (Nota_Fiscal),
     CONSTRAINT fk_transacao_vendedor  FOREIGN KEY (Agente_Mercado_Vendedor)
