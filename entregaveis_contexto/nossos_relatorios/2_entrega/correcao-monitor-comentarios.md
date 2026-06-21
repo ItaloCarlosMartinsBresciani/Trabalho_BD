@@ -9,11 +9,11 @@ Correções feitas por nós em relação a essa observação no modelo relaciona
 - Na tabela `Lote`, o atributo `Status_Ciclo_de_Vida` foi alterado para `NOT NULL` para garantir que todo lote tenha um status definido  (`disponível`, `aposentado`, `invalidado`).
 - Na tabela `Laudo`, o atributo `Certificador` foi alterado para `NOT NULL` para garantir que todo laudo tenha um certificador definido.
 
-[Observação na justificativa J2] "...a única solução estruturalmente correta..." é uma afirmação muito drástica
+[Observação na justificativa J2] "...a única solução estruturalmente correta..." é uma afirmação muito drástica -> FEITO (mudamos essa frase para não ser drástica).
 
-[Observação na Justificativa J3] "...permite identificar rapidamente todos os papéis.."  mas precisa fazer operações de junção pra identificar os papeis.
+[Observação na Justificativa J3] "...permite identificar rapidamente todos os papéis.."  mas precisa fazer operações de junção pra identificar os papeis. FEITO (mudamos para falar que precisa fazer o JOINs cruzando PESSOA JURIDICA, AGENTE MERCADO, TIPO AGENTE MERCADO e as tabelas de subclasse para recuperar o perfil completo).
 
 [Observação na Justificativa J4] "... requisito de que cada Atividade está vinculada a, no máximo, um
-Originador..."  E no mínimo a 1 também (faltou comentar sobre a totalidade, isto é, sobre que toda ocorrência de atividade precisa estar associada a pelo menos um Originador).
+Originador..."  E no mínimo a 1 também (faltou comentar sobre a totalidade) -> FEITO (mudamos para falar que cada Atividade precisa estar vinculada a, no mínimo, um e no máximo um Originador, o que garante a totalidade).
 
 [Observação na Justificativa J5] aqui também poderia ter comentado sobre as totalidades (Projeto precisa estar vinculado a atividade porque tem participação total assim como Atividade precisa estar associado a originador).
