@@ -2,7 +2,7 @@
 -- CarbonTrack - Sistema de Rastreabilidade para Créditos de Carbono
 -- Esquema de criação das tabelas (DDL)
 --
--- SGBD alvo: PostgreSQL
+-- SGBD utilizado: PostgreSQL
 -- Gerado a partir do Modelo Relacional V4 (nossos_relatorios/2_entrega)
 -- e das Justificativas (J1-J10) e Notas (N1-N11) descritas em relatorio.tex
 --
@@ -14,11 +14,11 @@
 --
 -- VALIDAÇÃO DE FORMATO (REGEX): campos com formato fixo (CNPJ, CEP, UF e URL)
 -- são validados por cláusulas CHECK usando o operador "~" do PostgreSQL.
---   CNPJ  → "NN.NNN.NNN/NNNN-NN"
---   CEP   → "NNNNN-NNN"
---   UF    → uma das 27 siglas oficiais (maiúsculas)
---   URL   → começa com "http://" ou "https://" sem espaços
--- ============================================================================
+--   CNPJ deve seguir o modelo "NN.NNN.NNN/NNNN-NN"
+--   CEP deve seguir o modelo "NNNNN-NNN"
+--   UF deve ser uma das 27 siglas oficiais (maiúsculas)
+--   URL deve começa com "http://" ou "https://" sem espaços
+-- =============================================
 
 -- Remoção em ordem inversa de dependência (facilita recriação durante o desenvolvimento)
 DROP TABLE IF EXISTS TRANSACAO_LOTE      CASCADE;
@@ -61,7 +61,7 @@ CREATE TABLE PESSOA_JURIDICA (
 -- ENDERECO -- J2
 -- Atributo composto e multivalorado: relação própria com PK composta
 -- (CNPJ, CEP, Estado, Rua), permitindo sede + filiais sem duplicação.
--- N1: ON DELETE CASCADE para evitar endereços órfãos.
+-- N1: ON DELETE CASCADE para evitar endereços órfãos(que sobraram em caso de delete).
 -- ============================================================================
 CREATE TABLE ENDERECO (
     CNPJ   VARCHAR(18)  NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE AGENTE_CONFORMIDADE (
 
 -- ============================================================================
 -- AUDITOR (subclasse de Agente de Conformidade) -- J8
--- N8/N9: consistência com Atribuição e totalidade garantidas via trigger/aplicação.
+-- N8/N9: consistência com Atribuição e totalidade garantidas via trigger na aplicação.
 -- ============================================================================
 CREATE TABLE AUDITOR (
     CNPJ                      VARCHAR(18) NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE CERTIFICADOR (
 
 -- ============================================================================
 -- PROJETO
--- N10: Data_Fim >= Data_Inicio.  N11: Duracao mantida coerente via trigger/aplicação (J10).
+-- N10: Data_Fim >= Data_Inicio.  N11: Duracao mantida coerente via trigger na aplicação (J10).
 -- ============================================================================
 CREATE TABLE PROJETO (
     Num_Licenca_Ambiental VARCHAR(50)  NOT NULL,
@@ -195,11 +195,11 @@ CREATE TABLE PROJETO (
 -- ============================================================================
 -- ATIVIDADE -- J4, J5
 -- Absorve por Chave Estrangeira os relacionamentos 1:N Realiza (Originador),
--- Contém (Projeto) e Audita (Auditor).
---   * Originador  -> NOT NULL, N6: ON DELETE RESTRICT (preserva rastreabilidade).
---   * Projeto     -> opcional (atividade pode não pertencer a um projeto).
---   * Auditor     -> N7: nasce NULL, preenchido por UPDATE na contratação.
--- N10: Data_Fim >= Data_Inicio.  N11: Duracao via trigger/aplicação (J10).
+-- Contém (Projeto e Audita (Auditor).
+--   Originador é NOT NULL, N6: ON DELETE RESTRICT (preserva rastreabilidade).
+--   Projeto (atividade pode não pertencer a um projeto).
+--   Auditor N7: nasce NULL, preenchido por UPDATE na contratação.
+-- N10: Data_Fim >= Data_Inicio.  N11: Duracao via trigger na aplicação (J10).
 -- ============================================================================
 CREATE TABLE ATIVIDADE (
     Codigo_Ordem_Servico VARCHAR(50)   NOT NULL,
@@ -247,7 +247,7 @@ CREATE TABLE LOTE (
 );
 
 -- ============================================================================
--- HISTORICO_PRECO (entidade fraca dependente do Lote) -- N6 (MER)
+-- HISTORICO_PRECO (entidade fraca dependente do Lote) N6 (MER)
 -- ON DELETE CASCADE: o histórico não existe sem o lote.
 -- ============================================================================
 CREATE TABLE HISTORICO_PRECO (
@@ -263,7 +263,7 @@ CREATE TABLE HISTORICO_PRECO (
 -- ============================================================================
 -- LAUDO (mapeamento da agregação Audita) -- J6
 -- A FK Atividade já identifica indiretamente o Auditor (evita redundância -- J6).
--- URL_do_Documento validada por regex http(s).
+-- URL_do_Documento validada por regex https.
 -- ============================================================================
 CREATE TABLE LAUDO (
     Numero_do_Protocolo VARCHAR(50)  NOT NULL,

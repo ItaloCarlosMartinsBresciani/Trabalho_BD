@@ -33,6 +33,138 @@ except ImportError:  # pragma: no cover
 
 
 # ----------------------------------------------------------------------------
+# Widgets de entrada com máscara
+# ----------------------------------------------------------------------------
+class DateEntry(ttk.Entry):
+    """Entry com máscara automática AAAA-MM-DD.
+    Aceita apenas dígitos e insere os hífens automaticamente."""
+
+    def __init__(self, master, textvariable, **kw):
+        kw.setdefault("width", 14)
+        super().__init__(master, textvariable=textvariable, **kw)
+        self._var = textvariable
+        self._busy = False
+        self._var.trace_add("write", self._on_change)
+
+    def _on_change(self, *_):
+        if self._busy:
+            return
+        raw = self._var.get()
+        digits = "".join(c for c in raw if c.isdigit())[:8]
+        if len(digits) >= 7:
+            fmt = f"{digits[:4]}-{digits[4:6]}-{digits[6:]}"
+        elif len(digits) >= 5:
+            fmt = f"{digits[:4]}-{digits[4:]}"
+        else:
+            fmt = digits
+        if fmt == raw:
+            return
+        try:
+            cur = self.index(tk.INSERT)
+            n_digits_before = sum(1 for c in raw[:cur] if c.isdigit())
+        except Exception:
+            n_digits_before = len(digits)
+        self._busy = True
+        self._var.set(fmt)
+        # Restaura o cursor após o mesmo número de dígitos na string formatada
+        new_pos = len(fmt)
+        count = 0
+        for i, ch in enumerate(fmt):
+            if ch.isdigit():
+                count += 1
+            if count == n_digits_before:
+                new_pos = i + 1
+                break
+        self.after_idle(lambda p=new_pos: self.icursor(p))
+        self._busy = False
+
+
+class DecimalEntry(ttk.Entry):
+    """Entry que aceita apenas valores decimais não-negativos.
+    Aceita vírgula ou ponto como separador decimal."""
+
+    def __init__(self, master, textvariable, **kw):
+        kw.setdefault("width", 24)
+        super().__init__(master, textvariable=textvariable, **kw)
+        vcmd = (self.register(self._validate), "%P")
+        self.configure(validate="key", validatecommand=vcmd)
+
+    @staticmethod
+    def _validate(new_val):
+        if not new_val:
+            return True
+        if sum(1 for c in new_val if c in ".,") > 1:
+            return False
+        return all(c.isdigit() or c in ".," for c in new_val)
+
+
+# ----------------------------------------------------------------------------
+# Widgets de entrada com máscara
+# ----------------------------------------------------------------------------
+class DateEntry(ttk.Entry):
+    """Entry com máscara automática AAAA-MM-DD.
+    Aceita apenas dígitos e insere os hífens automaticamente."""
+
+    def __init__(self, master, textvariable, **kw):
+        kw.setdefault("width", 14)
+        super().__init__(master, textvariable=textvariable, **kw)
+        self._var = textvariable
+        self._busy = False
+        self._var.trace_add("write", self._on_change)
+
+    def _on_change(self, *_):
+        if self._busy:
+            return
+        raw = self._var.get()
+        digits = "".join(c for c in raw if c.isdigit())[:8]
+        if len(digits) >= 7:
+            fmt = f"{digits[:4]}-{digits[4:6]}-{digits[6:]}"
+        elif len(digits) >= 5:
+            fmt = f"{digits[:4]}-{digits[4:]}"
+        else:
+            fmt = digits
+        if fmt == raw:
+            return
+        try:
+            cur = self.index(tk.INSERT)
+            n_digits_before = sum(1 for c in raw[:cur] if c.isdigit())
+        except Exception:
+            n_digits_before = len(digits)
+        self._busy = True
+        self._var.set(fmt)
+        # Restaura o cursor após o mesmo número de dígitos na string formatada
+        new_pos = len(fmt)
+        count = 0
+        for i, ch in enumerate(fmt):
+            if ch.isdigit():
+                count += 1
+            if count == n_digits_before:
+                new_pos = i + 1
+                break
+        self.after_idle(lambda p=new_pos: self.icursor(p))
+        self._busy = False
+
+
+class DecimalEntry(ttk.Entry):
+    """Entry que aceita apenas valores decimais não-negativos.
+    Aceita vírgula ou ponto como separador decimal."""
+
+    def __init__(self, master, textvariable, **kw):
+        kw.setdefault("width", 24)
+        super().__init__(master, textvariable=textvariable, **kw)
+        vcmd = (self.register(self._validate), "%P")
+        self.configure(validate="key", validatecommand=vcmd)
+
+    @staticmethod
+    def _validate(new_val):
+        if not new_val:
+            return True
+        if sum(1 for c in new_val if c in ".,") > 1:
+            return False
+        return all(c.isdigit() or c in ".," for c in new_val)
+
+
+# ----------------------------------------------------------------------------
 # Paleta de cores e fontes # verde escuro (tema "carbono/floresta")
 # ----------------------------------------------------------------------------
 COR_PRIMARIA   = "#1b5e20"   
@@ -394,8 +526,8 @@ class CarbonTrackApp(tk.Tk):
         linhas = [
             ("Nº Licença Ambiental *", self.p_num,   "ex.: LA-2025-010"),
             ("Nome do Projeto *",      self.p_nome,  "ex.: Recuperação de Nascentes"),
-            ("Data de Início * (AAAA-MM-DD)", self.p_ini, "ex.: 2025-01-01"),
-            ("Data de Fim (AAAA-MM-DD)",      self.p_fim, "opcional"),
+            ("Data de Início *",       self.p_ini,   "ex.: 20250101",  DateEntry),
+            ("Data de Fim",            self.p_fim,   "opcional",       DateEntry),
             ("Metodologia Aplicada",   self.p_metod, "opcional"),
         ]
         self._grade_campos(master, linhas, linha_inicial=2)
@@ -412,18 +544,19 @@ class CarbonTrackApp(tk.Tk):
         ttk.Label(master, text="Cadastro de Atividade de Campo",
                   style="Secao.TLabel").grid(row=0, column=0, columnspan=2,
                                              sticky="w", pady=(0, 4))
-        ttk.Label(master, text="O Originador é obrigatório; Projeto é opcional. "
-                  "O Auditor nasce vazio e é vinculado depois.").grid(
+        ttk.Label(master, text="O Originador é obrigatório; Projeto e Auditor são opcionais.").grid(
                   row=1, column=0, columnspan=2, sticky="w", pady=(0, 14))
 
         self.a_cod    = tk.StringVar()
         self.a_orig   = tk.StringVar()
         self.a_proj   = tk.StringVar()
+        self.a_aud    = tk.StringVar()
         self.a_desc   = tk.StringVar()
         self.a_custo  = tk.StringVar()
         self.a_ini    = tk.StringVar()
         self.a_fim    = tk.StringVar()
         self.a_cred   = tk.StringVar()
+        self._aud_map = {}
 
         r = 2
         ttk.Label(master, text="Código Ordem de Serviço *").grid(row=r, column=0, sticky="w", pady=5)
@@ -437,15 +570,19 @@ class CarbonTrackApp(tk.Tk):
         self.cb_proj = ttk.Combobox(master, textvariable=self.a_proj, width=40, state="readonly")
         self.cb_proj.grid(row=r, column=1, sticky="w"); r += 1
 
-        for rotulo, var, dica in [
-            ("Descrição da Atividade", self.a_desc, ""),
-            ("Custo Operacional (R$)", self.a_custo, "ex.: 50000.00"),
-            ("Data de Início * (AAAA-MM-DD)", self.a_ini, "ex.: 2025-02-01"),
-            ("Data de Fim (AAAA-MM-DD)", self.a_fim, "opcional"),
-            ("Crédito Estimado (tCO₂e)", self.a_cred, "ex.: 1200.00"),
+        ttk.Label(master, text="Auditor (opcional)").grid(row=r, column=0, sticky="w", pady=5)
+        self.cb_aud = ttk.Combobox(master, textvariable=self.a_aud, width=40, state="readonly")
+        self.cb_aud.grid(row=r, column=1, sticky="w"); r += 1
+
+        for rotulo, var, cls in [
+            ("Descrição da Atividade",  self.a_desc,  ttk.Entry),
+            ("Custo Operacional (R$)",  self.a_custo, DecimalEntry),
+            ("Data de Início *",        self.a_ini,   DateEntry),
+            ("Data de Fim",             self.a_fim,   DateEntry),
+            ("Crédito Estimado (tCO₂e)", self.a_cred, DecimalEntry),
         ]:
             ttk.Label(master, text=rotulo).grid(row=r, column=0, sticky="w", pady=5)
-            ttk.Entry(master, textvariable=var, width=42).grid(row=r, column=1, sticky="w")
+            cls(master, textvariable=var, width=42).grid(row=r, column=1, sticky="w")
             r += 1
 
         ttk.Button(master, text="Atualizar listas", command=self._carregar_combos).grid(
@@ -455,10 +592,12 @@ class CarbonTrackApp(tk.Tk):
                    row=r, column=1, sticky="e", pady=(18, 0))
 
     def _grade_campos(self, master, linhas, linha_inicial):
-        for i, (rotulo, var, dica) in enumerate(linhas):
+        for i, item in enumerate(linhas):
+            rotulo, var, dica = item[0], item[1], item[2]
+            cls = item[3] if len(item) > 3 else ttk.Entry
             r = linha_inicial + i
             ttk.Label(master, text=rotulo).grid(row=r, column=0, sticky="w", pady=5)
-            entry = ttk.Entry(master, textvariable=var, width=42)
+            entry = cls(master, textvariable=var, width=42)
             entry.grid(row=r, column=1, sticky="w")
             if dica:
                 ttk.Label(master, text=dica, foreground="#888").grid(
@@ -603,10 +742,17 @@ class CarbonTrackApp(tk.Tk):
                     FROM PROJETO ORDER BY Nome_Projeto
                 """)
                 self._proj_map = {f"{nome} — {num}": num for num, nome in cur.fetchall()}
+                cur.execute("""
+                    SELECT a.CNPJ, pj.Nome_Fantasia
+                    FROM AUDITOR a JOIN PESSOA_JURIDICA pj ON a.CNPJ = pj.CNPJ
+                    ORDER BY pj.Nome_Fantasia
+                """)
+                self._aud_map = {f"{nome} — {cnpj}": cnpj for cnpj, nome in cur.fetchall()}
             self.conn.rollback()  # encerra a transação de leitura
             self.cb_orig["values"] = list(self._orig_map.keys())
             self.cb_proj["values"] = ["(nenhum)"] + list(self._proj_map.keys())
-            self._set_status("Listas de Originadores e Projetos atualizadas.")
+            self.cb_aud["values"]  = ["(nenhum)"] + list(self._aud_map.keys())
+            self._set_status("Listas de Originadores, Projetos e Auditores atualizadas.")
         except Exception as exc:
             self.conn.rollback()
             self._set_status(f"Erro ao carregar listas: {exc}", erro=True)
@@ -714,6 +860,13 @@ class CarbonTrackApp(tk.Tk):
                 if num_proj is None:
                     raise ValueError("Projeto inválido. Atualize a lista e selecione novamente.")
 
+            sel_aud = self.a_aud.get().strip()
+            cnpj_aud = None
+            if sel_aud and sel_aud != "(nenhum)":
+                cnpj_aud = self._aud_map.get(sel_aud)
+                if cnpj_aud is None:
+                    raise ValueError("Auditor inválido. Atualize a lista e selecione novamente.")
+
             desc  = self.a_desc.get().strip() or None
             custo = self._parse_decimal(self.a_custo.get(), "Custo Operacional")
             cred  = self._parse_decimal(self.a_cred.get(), "Crédito Estimado")
@@ -728,14 +881,13 @@ class CarbonTrackApp(tk.Tk):
 
         try:
             with self.conn.cursor() as cur:
-                # Auditor nasce NULL (N7); é vinculado posteriormente.
                 cur.execute("""
                     INSERT INTO ATIVIDADE
                         (Codigo_Ordem_Servico, Originador, Projeto, Auditor,
                          Descricao_Atividade, Custo_Operacional, Data_Inicio,
                          Data_Fim, Duracao, Credito_Estimado)
-                    VALUES (%s, %s, %s, NULL, %s, %s, %s, %s, %s, %s)
-                """, (cod, cnpj_orig, num_proj, desc, custo, d_ini, d_fim, duracao, cred))
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (cod, cnpj_orig, num_proj, cnpj_aud, desc, custo, d_ini, d_fim, duracao, cred))
             self.conn.commit()
             messagebox.showinfo("Sucesso",
                                 f"Atividade '{cod}' cadastrada com sucesso.\n"
@@ -746,6 +898,7 @@ class CarbonTrackApp(tk.Tk):
                           self.a_fim, self.a_cred])
             self.a_orig.set("")
             self.a_proj.set("")
+            self.a_aud.set("")
         except Exception as exc:
             self._tratar_erro_banco(exc)
 
