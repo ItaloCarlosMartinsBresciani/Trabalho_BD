@@ -5,7 +5,7 @@ Baseado nos requisitos do documento `Projeto_Sustentabilidade_e_Gestao_de_Recurs
 ## 1. O que precisa ir para o Novo Relatório Final (PDF)
 Vocês devem criar um arquivo final (ex: `relatorio_Parte3_Final.pdf`) que seja um aglomerado de todo o trabalho, contendo:
 
-- [ ] **Inclusão da Parte 1 e 2:** Coloquem a Modelagem (MER e Descrição) e o Projeto Lógico das entregas anteriores. **Atenção:** Se o monitor descontou nota nas entregas 1 e 2, vocês **precisam** colocar a versão corrigida neste arquivo final e deixar claro/indicado o que foi arrumado. Se entregarem com os mesmos erros passados, a nota é descontada em dobro (está faltando corrigir os erros apontados na parte 2).
+- [ ] **Inclusão da Parte 1 e 2:** Coloquem a Modelagem (MER e Descrição) e o Projeto Lógico das entregas anteriores. **Atenção:** Se o monitor descontou nota nas entregas 1 e 2, vocês **precisam** colocar a versão corrigida neste arquivo final e deixar claro/indicado o que foi arrumado. Se entregarem com os mesmos erros passados, a nota é descontada em dobro (está faltando corrigir os erros apontados na parte 2 em entregaveis_contexto/nossos_relatorios/2_entrega/correcao-monitor-comentarios.md).
 - [ ] **Justificativas e Contexto das Consultas:** As 5 ou 6 consultas presentes em `consultas.sql` **precisam ser explicadas no relatório**. Copiem o que vocês têm no `explicacao_consultas.txt` para o PDF. É exigência justificar por que essa consulta é útil no contexto do negócio (CarbonTrack).
 - [ ] **Descrição do Sistema (Nova Seção):** Criar um texto explicando o sistema que vocês implementaram no Python:
   - Informar o SGBD utilizado (PostgreSQL) e a linguagem (Python / Tkinter / psycopg2).
