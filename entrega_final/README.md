@@ -110,7 +110,7 @@ pip install -r requirements.txt
 ### 3. Executando o Aplicativo
 Com os containers do Docker de banco de dados rodando (Passo 1 do tópico anterior), execute o script principal:
 ```bash
-python codigo_sistema/app.py
+python codigo_sistema-aplicacao/app.py
 ```
 Na tela inicial que irá se abrir, preencha as credenciais do banco para acessar o sistema:
 - **Usuário:** `rapazinhos`
