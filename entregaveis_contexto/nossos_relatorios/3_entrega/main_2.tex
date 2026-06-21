@@ -1,0 +1,668 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{indentfirst}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{setspace}
+\usepackage{pdflscape}
+\usepackage{graphicx} % Pacote necessário para inserir imagens
+\usepackage{listings} % Realce de código-fonte (Parte 3)
+\usepackage{xcolor}
+
+% --- Estilo de realce de sintaxe para os trechos de código (Parte 3) ---
+\definecolor{codegreen}{rgb}{0.00,0.45,0.13}
+\definecolor{codegray}{rgb}{0.50,0.50,0.50}
+\definecolor{codeblue}{rgb}{0.10,0.10,0.65}
+\definecolor{codemagenta}{rgb}{0.72,0.05,0.45}
+\definecolor{codebg}{rgb}{0.97,0.97,0.97}
+
+\renewcommand{\lstlistingname}{Código}
+
+\lstdefinestyle{codigo}{
+    backgroundcolor=\color{codebg},
+    commentstyle=\color{codegreen}\itshape,
+    keywordstyle=\color{codemagenta}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codeblue},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showstringspaces=false,
+    tabsize=2,
+    frame=single,
+    rulecolor=\color{codegray},
+    literate=%
+      {á}{{\'a}}1 {à}{{\`a}}1 {ã}{{\~a}}1 {â}{{\^a}}1
+      {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1
+      {ó}{{\'o}}1 {ô}{{\^o}}1 {õ}{{\~o}}1
+      {ú}{{\'u}}1 {ç}{{\c c}}1
+      {Á}{{\'A}}1 {Ã}{{\~A}}1 {Â}{{\^A}}1
+      {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ç}{{\c C}}1
+      {—}{{---}}1 {–}{{--}}1
+}
+\lstset{style=codigo}
+
+\onehalfspacing
+
+\begin{document}
+
+% --- CAPA ---
+\begin{titlepage}
+    \centering
+    \textsf{\large \textbf{Universidade de São Paulo}} \\
+    \textsf{\large ICMC - Instituto de Ciências Matemáticas e de Computação} \\
+    \vspace{4cm}
+    \textsf{\Large Disciplina: SSC0240 - Bases de Dados} \\
+    \textsf{\Large Prof. Dra. Elaine Parros M. de Sousa} \\
+    \vspace{3cm}
+    \textsf{\huge \textbf{CarbonTrack}} \\
+    \textsf{\large Sistema de Rastreabilidade para Créditos de Carbono} \\
+    \vspace{4cm}
+    \begin{flushleft}
+        \textbf{Membros:} \\
+        Luiz Gabriel Correia dos Santos - 15639682\\
+        Italo Carlos Martins Bresciani - 15461782 \\
+        Arthur Filliettaz Mendes - 12532055 \\
+        Thiago Pasquoto Tavares - 15490194
+    \end{flushleft}
+    \vfill
+    \textsf{São Carlos \\ 2026}
+\end{titlepage}
+
+% --- SUMÁRIO ---
+\clearpage
+\tableofcontents
+\clearpage
+
+% --- CONTEÚDO ---
+\section{Introdução}
+
+\subsection{Contextualização}
+A mitigação das mudanças climáticas tornou-se uma prioridade global impulsionada pela Agenda 2030 da ONU e pelos Objetivos de Desenvolvimento Sustentável (ODS). Nesse cenário, o mercado de créditos de carbono surge como um mecanismo financeiro essencial. Um crédito de carbono representa a certificação de que uma tonelada de dióxido de carbono (CO$_2$) equivalente\footnote{O CO$_2$ equivalente (CO$_2$e) é uma métrica universal utilizada para comparar as emissões de vários gases de efeito estufa (como metano e óxido nitroso) com base em seu Potencial de Aquecimento Global (GWP).} deixou de ser emitida ou foi removida da atmosfera. Para que esse mercado funcione, é vital a atuação de diferentes instituições: \textbf{Originadores} (que criam os \textbf{Projetos} de redução), \textbf{Auditores} (que verificam a execução técnica), \textbf{Certificadoras} (que emitem os créditos oficiais) e os \textbf{Compradores} (empresas que adquirem os créditos para compensar suas próprias emissões).
+
+\subsection{Problema}
+O principal desafio no mercado de créditos de carbono é garantir a transparência, a rastreabilidade e a integridade dos ativos gerados, evitando fraudes como a dupla contagem (vender o mesmo crédito duas vezes) ou a emissão de créditos sem lastro real. Atualmente, a descentralização das informações dificulta a auditoria e a verificação do ciclo de vida completo de um crédito, desde a \textbf{Atividade} de campo que o gerou até a sua negociação e eventual aposentadoria no mercado financeiro\footnote{A "aposentadoria" (\textit{retirement}) de um crédito de carbono ocorre quando o \textbf{Comprador} final o utiliza para compensar suas emissões. O crédito é então retirado permanentemente dos registros públicos para garantir que não volte a circular no mercado.}. É necessário um sistema rigoroso de gestão de dados capaz de mapear e validar cada etapa desse fluxo.
+
+\subsection{Objetivos e Usuário-Alvo}
+O sistema CarbonTrack tem como propósito principal atuar como uma plataforma de base de dados robusta para registrar, rastrear e regular o ciclo de vida e a comercialização de créditos de carbono. Seus objetivos incluem: garantir a integridade referencial entre \textbf{Atividades} de campo e os \textbf{Lotes} de créditos gerados, mapear as transferências de titularidade e fornecer um histórico confiável de precificação. 
+
+O usuário-alvo abrange todos os atores corporativos e institucionais do mercado de carbono: empresas desenvolvedoras de \textbf{Projetos} (\textbf{Originadores}), entidades de auditoria independente (\textbf{Auditores}), órgãos certificadores internacionais (\textbf{Certificadores}) e empresas \textbf{Compradoras} de créditos para compensação ambiental.
+
+\section{Modelo Entidade-Relacionamento}
+
+\subsection{Descrição geral do sistema e Requisitos de Dados}
+O fluxo de dados da plataforma CarbonTrack inicia-se com o cadastro das instituições participantes, modeladas pela entidade \textbf{Pessoa Jurídica}, identificada unicamente pelo seu \underline{CNPJ} (identificador único universal) e descrita por sua \underline{Razão Social} (dado cadastral legal), \underline{Nome Fantasia} (dado cadastral legal), \underline{Status} (indica se a instituição está apta a operar) e um \underline{Endereço} (atributo que é composto por \underline{CEP}, \underline{Estado} e \underline{Rua}; modelado para permitir o armazenamento simultâneo dos endereços de sede e filiais de uma mesma empresa). Toda instituição no sistema deve ser obrigatoriamente um \textbf{Agente de Mercado} ou um \textbf{Agente de Conformidade}, garantindo a separação entre quem lucra com os créditos e quem os fiscaliza.
+
+O \textbf{Agente de Mercado} é categorizado por um atributo de \underline{Tipo} (diferencia regras gerais de mercado), podendo atuar como \textbf{Originador} (possuindo \underline{Setor de Atuação} e um documento de \underline{Capacidade Técnica}) e \textbf{Comprador} (possuindo \underline{Perfil Comprador}) simultaneamente. Já o \textbf{Agente de Conformidade} possui uma \underline{Atribuição} e pode atuar como um \textbf{Auditor} (identificado por seu \underline{Registro de Acreditação} e respectiva \underline{Data de Validade da} \underline{Acreditação}) ou um \textbf{Certificador} (descrito pelo \underline{Padrão de Certificação} que segue, como o padrão Verra\footnote{A Verra gerencia o \textit{Verified Carbon Standard} (VCS), que é um dos maiores e mais rigorosos programas de certificação de redução de emissões no mercado voluntário global.}).
+
+No escopo operacional, o \textbf{Originador} realiza \textbf{Atividades} de campo (como plantio ou monitoramento), identificadas pelo \underline{Código de Ordem de Serviço} (identificador no contexto do projeto), possuindo \underline{Descrição da Atividade}, \underline{Custo Operacional} (dados monetários de execução), cronograma com \underline{Data de Início} e \underline{Data de Fim}, gerando a \underline{Duração} (característica derivada das datas balizadoras) e um \underline{Crédito Estimado} (projeção do volume de carbono). Várias \textbf{Atividades} podem estar agrupadas dentro de um \textbf{Projeto} de mitigação ambiental, o qual é unicamente identificado pelo \underline{Número de Licença Ambiental}, possuindo \underline{Nome do Projeto}, \underline{Metodologia Aplicada}, cronograma próprio de \underline{Data de Início} e \underline{Data de Fim}, além de sua \underline{Duração}. É mandatório que um \textbf{Projeto} contenha \textbf{Atividades} para existir no sistema.
+
+A regulação exige que o \textbf{Auditor} realize inspeções nas \textbf{Atividades}, originando um \textbf{Laudo} (identificado por \underline{Número do Protocolo da Auditoria}, com \underline{Parecer Final}, \underline{Crédito} \underline{Real} aferido, e uma \underline{URL do Documento} apontando para o arquivo original). Posteriormente, o \textbf{Certificador} analisa o \textbf{Laudo} e \textbf{Verifica} a \textbf{Atividade}, que por sua vez \textbf{Gera} um \textbf{Lote} de créditos de carbono. O \textbf{Lote} é a representação do ativo financeiro, identificado por \underline{Número de Série} \underline{de Registro} (identificador único global), detalhando a \underline{Quantidade de Créditos} (toneladas de CO2 equivalentes), o \underline{Ano de Geração}, o \underline{Valor} estipulado e seu \underline{Status do Ciclo} \underline{de Vida} (estado vitalício restrito a Disponível, Aposentado ou Inativo). Imediatamente após ser gerado, a posse inicial do \textbf{Lote} é inferida indiretamente ao \textbf{Originador} que realizou a respectiva atividade.
+
+Para acompanhar a volatilidade do mercado, cada \textbf{Lote} possui um \textbf{Histórico de Preços}, identificada parcialmente pela \underline{Data} e completamente observando também o Número de série do Lote, armazenando o \underline{Preço} ao longo do tempo. Por fim, a transferência de titularidade ocorre por meio de uma \textbf{Transação}, que conecta o \textbf{Agente de Mercado} (em papéis de comprador e vendedor) ao \textbf{Lote}. A \textbf{Transação} é identificada pela \underline{Nota Fiscal}, contendo \underline{Data e Hora} e o \underline{Valor} da negociação.
+
+\subsection{Principais Funcionalidades}
+O sistema foi projetado para suprir operações interativas por parte de seus usuários, contemplando cadastros (inserções), atualizações e remoções (físicas e lógicas):
+
+\begin{itemize}
+    \item \textbf{Originador:}
+    \begin{itemize}
+        \item Cadastra novos \textbf{Projetos} de mitigação ambiental.
+        \item Registra \textbf{Atividades} de campo, vinculando-as (ou não) a um projeto.
+        \item Visualiza os \textbf{Lotes} gerados e atribuídos à sua empresa após certificação.
+        \item Registra \textbf{Transações} de venda de Lotes Disponíveis para outros agentes.
+        \item {Exclui} cadastros de {Projetos} ou \textbf{Atividades} inseridos erroneamente no sistema, desde que ainda não tenham passado por auditoria formal.
+    \end{itemize}
+    
+    \item \textbf{Comprador:}
+    \begin{itemize}
+        \item Consulta histórico e origem de \textbf{Lotes} de carbono antes da aquisição.
+        \item Participa de \textbf{Transações} de compra de créditos de carbono.
+        \item Solicita a alteração do Status do Ciclo de Vida de um Lote para "Aposentado" visando a compensação de suas pegadas de carbono (atualização).
+        \item Vende ativos que estão sob sua posse e pode realizar operações de mudança de valor dos lotes que possui. 
+    \end{itemize}
+
+    \item \textbf{Auditor:}
+    \begin{itemize}
+        \item Consulta as \textbf{Atividades} de campo ativas no sistema.
+        \item Registra \textbf{Laudos} técnicos baseados na vistoria técnica destas atividades, inserindo pareceres e URLs de documentos.
+        \item {Remove} rascunhos de {Laudos} contendo erros de preenchimento, antes do envio definitivo para a análise da certificadora.
+    \end{itemize}
+
+    \item \textbf{Certificador:}
+    \begin{itemize}
+        \item Analisa os \textbf{Laudos} submetidos pelos auditores.
+        \item Emite e registra novos \textbf{Lotes} de carbono baseados em laudos com pareceres positivos.
+        \item {Invalida (remoção lógica/inativação)} {Lotes} já emitidos caso sejam detectadas fraudes ou dupla contagem em revisões posteriores, garantindo o \textit{compliance} e a integridade da plataforma.
+    \end{itemize}
+\end{itemize}
+
+%\textbf{Consultas Estratégicas e Analíticas:}
+A partir dessas operações o banco de dados deve suportar buscas gerenciais complexas, garantindo consultas estratégicas e analíticas, tais como:
+\begin{enumerate}
+    \item \textbf{Rastreabilidade de Lote:} Dado o número de série de um \textbf{Lote}, retornar o histórico completo, desde a \textbf{Transação} de compra até o \textbf{Projeto}/\textbf{Atividade} que o gerou, incluindo o \textbf{Certificador} e \textbf{Auditor} envolvidos (Múltiplas Junções).
+    \item \textbf{Desempenho de Projetos:} Listar o total de créditos gerados e o valor financeiro movimentado agrupado por \textbf{Projeto} (Agrupamento e Funções de Agregação).
+    \item \textbf{Auditoria de Conformidade:} Identificar \textbf{Atividades} finalizadas que ainda não possuem um \textbf{Laudo} emitido por um \textbf{Auditor}.
+    \item \textbf{Análise de Flutuação de Preço:} Recuperar a evolução histórica de preços do crédito de um \textbf{Lote} específico ao longo do ano.
+    \item \textbf{Filtro de Certificação:} Encontrar os \textbf{Originadores} que possuem \textbf{Atividades} aprovadas por \textit{todas} as \textbf{Certificadoras} ativas no sistema, demonstrando alto nível de adequação e conformidade global.
+\end{enumerate}
+
+\subsection{Restrições de Integridade e Notas do Sistema}
+Para assegurar a consistência dos dados e refletir as regras de negócio do mercado de carbono, foram estabelecidas as seguintes notas:
+
+\subsubsection{Notas Gerais}
+\begin{itemize}
+    \item \textbf{Unicidade e Dependência:} O CNPJ deve ser único para qualquer \textbf{Pessoa Jurídica}. O \textbf{Histórico de Preços} é dependente do \textbf{Lote}.
+    \item \textbf{Separação de Papéis (Disjunção):} Um \textbf{Agente de Mercado} jamais pode auditar ou certificar créditos, impedindo conflitos de interesse.
+    \item \textbf{Participação Total:} Um \textbf{Projeto} não pode existir sem estar associado a, pelo menos, uma \textbf{Atividade}.
+    \item \textbf{Nota 1 (N1) - Endereço Multivalorado:} Permite armazenar endereços de sede e filiais.
+    \item \textbf{Nota 2 (N2) - Entidade Projeto:} Um projeto representa um conjunto de atividades relacionadas à geração de créditos ambientais.
+    \item \textbf{Nota 3 (N3) - Detentor Inicial:} O Lote deve ser atribuído inicialmente ao Originador da atividade.
+    \item \textbf{Nota 5 (N5) - Ciclo de Vida do Ativo:} Status restrito a "Disponível", "Aposentado" e "Invalidado".
+    \item \textbf{Nota 6 (N6) - Histórico de Preço:} Relação 1:N para guardar atualizações cronológicas de valor.
+\end{itemize}
+
+\subsubsection{Notas sobre Ciclos e Regras de Negócio}
+\begin{itemize}
+    \item \textbf{Nota 4 (N4) - Automação de Posse Inicial:} O sistema implementará uma regra de automação para que, no momento em que a Certificadora \textbf{Verifica} uma Atividade e esta \textbf{Gera} um respectivo Lote, o sistema identifique o dono inicial consultando o Originador responsável por \textbf{Realizar} essa Atividade.
+    \item \textbf{Nota 7 (N7) - Ciclo da Negociação:} Um agente não pode comprar um lote que já está sob sua posse. Como esta restrição de ciclo não pode ser garantida estritamente pelas cardinalidades do MER, ela será tratada como uma regra de validação na camada de aplicação.
+\end{itemize}
+
+\subsection{Diagrama do Modelo Entidade-Relacionamento}
+Abaixo está o diagrama do Modelo Entidade-Relacionamento (MER). Notas visuais foram removidas da imagem para maior clareza, estando agora descritas textualmente.
+
+\clearpage % Quebra a página e finaliza o texto anterior
+
+\begin{landscape}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=1.2\textwidth]{images/MER_BD_sem_nota_09-05-2026.png}
+    \caption{Diagrama MER do projeto CarbonTrack.}
+    \label{fig:mer}
+\end{figure}
+
+\end{landscape}
+
+\clearpage % Garante que o restante do texto do relatório só comece na página seguinte
+
+\section{Correções da Parte 1}
+
+Antes da realização da segunda etapa do projeto, foram efetuadas modificações no modelo original visando corrigir inconsistências e otimizar a estrutura relacional futura. As alterações são detalhadas a seguir:
+
+\begin{itemize}
+    \item \textbf{Redução de Termos Técnicos na Descrição Geral:} Visando facilitar a compreensão do sistema por stakeholders e clientes não técnicos, os requisitos de dados (seção 2.1) foram revisados para remover jargões excessivos, tornando a descrição funcional mais acessível.
+    
+    \item \textbf{Adição da Nota N7 sobre Ciclo da Negociação:} Foi identificada a necessidade de impedir que um Agente de Mercado adquira créditos de sua própria titularidade. Como restrições de ciclo complexas possuem limitações de representação no MER, adicionou-se a Nota 7 para garantir que essa validação ocorra na camada de lógica do sistema.
+    
+    \item \textbf{Reestruturação da Origem de Lotes (CR Gera):} Na versão anterior, a conexão direta entre \textbf{Originador} e \textbf{Lote} causava perda de rastreabilidade sobre qual processo produtivo gerou o ativo. O modelo foi corrigido adicionando-se um Relacionamento \textbf{Gera} entre \textbf{Atividade} e \textbf{Lote}. Agora, o Originador é rastreado indiretamente via Atividade, preservando o histórico técnico.
+    
+    \item \textbf{Detalhamento da Automação (N4):} A Nota 4 foi expandida para descrever o processo de inferência de posse. Isso esclarece como o banco de dados deve se comportar no momento da emissão do crédito, garantindo que o vínculo entre o executor da atividade e o primeiro dono do lote seja automático e íntegro.
+    
+    \item \textbf{Organização de Notas sobre Ciclos:} Para melhorar a legibilidade das restrições, as notas que abordam consistência de fluxos (como N4 e N7) foram movidas para uma subseção dedicada, facilitando a consulta por parte dos desenvolvedores.
+    
+    \item \textbf{Quebra do Relacionamento Ternário "Negocia":} O relacionamento ternário original entre Comprador, Vendedor e Lote foi substituído por uma \textbf{Agregação} chamada \textbf{Transação}. A Transação agora se relaciona com o Lote através do CR \textbf{Contém}. Esta mudança permite que uma única Nota Fiscal englobe múltiplos Lotes (N:N), assim como Lotes podem se envolver em mais de uma transação durante o ciclo de vida do sistema, e trata a venda como um evento fiscal independente, reduzindo redundâncias.
+    
+    \item \textbf{Decisão Arquitetural sobre a Identificação do Proprietário Atual do Lote:} Foi cogitada uma mudança no MER para tratar a identificação explícita do proprietário atual do \textbf{Lote}, como a criação de um relacionamento \textbf{Possui} (1:N) entre \textbf{Agente de Mercado} e \textbf{Lote}. Contudo, optou-se por não introduzir essa redundância no modelo, pois ela geraria ciclos e representaria uma potencial vulnerabilidade à inconsistência de dados caso as atualizações não fossem devidamente sincronizadas. Assim, a identificação do proprietário atual é obtida por inferência a partir de dois caminhos já existentes: caso o Lote possua negociações registradas, o proprietário corresponde ao comprador da transação mais recente; caso contrário, o proprietário é o \textbf{Originador} da \textbf{Atividade} que gerou o Lote. A principal desvantagem assumida com essa abordagem é o custo computacional de realizar essa consulta com frequência em um cenário de alto volume de transações.
+    
+    \item \textbf{Melhorias de Apresentação:} O diagrama MER foi limpo, removendo-se balões de notas que poluíam a visualização. Além disso, a página foi configurada em modo paisagem (\textit{landscape}) para permitir a visualização de todos os atributos e entidades em escala adequada.
+\end{itemize}
+% ============================================================
+\section{Modelo Relacional}
+% ============================================================
+ 
+\subsection{Esquema Relacional}
+ 
+Abaixo está o diagrama do Modelo Relacional do sistema CarbonTrack, obtido a partir do mapeamento sistemático do Modelo Entidade-Relacionamento apresentado na seção anterior. O esquema reflete as decisões de mapeamento detalhadas nas subseções seguintes, com destaque para o tratamento das hierarquias de especialização, dos atributos multivalorados e dos relacionamentos com cardinalidades distintas.
+ 
+\clearpage
+ 
+\begin{landscape}
+ 
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=1.6\textwidth]{images/Modelo_Relacional-entrega3-v1.png}
+    \caption{Diagrama do Modelo Relacional do projeto CarbonTrack.}
+    \label{fig:relacional}
+\end{figure}
+ 
+\end{landscape}
+ 
+\clearpage
+ 
+\subsection{Justificativas para as Decisões de Mapeamento}
+ 
+\begin{itemize}
+ 
+    \item \textbf{Justificativa 1 (J1): Estrutura de Pessoa Jurídica:}
+    Optamos pela criação de uma tabela \textbf{Pessoa Jurídica} e uma tabela para cada subclasse dela, sendo o \textbf{CNPJ} a chave estrangeira (FK) das tabelas da subclasse. Duas alternativas foram consideradas e descartadas. Mapear apenas as subclasses eliminaria o custo de \textit{JOINs}, porém, para comportar o atributo multivalorado \texttt{ENDEREÇO}, seria necessário criar duas tabelas independentes de endereço (uma referenciando \textbf{Agente de Mercado} e outra referenciando \textbf{Agente de Conformidade}), gerando redundância estrutural e dificultando consultas globais sobre todas as instituições cadastradas. Por outro lado, criar uma única tabela \textit{"Pezão"} com discriminador (ex.: \texttt{Tipo\_PJ}) resultaria em muitos valores \texttt{NULL} decorrentes dos atributos exclusivos de cada subclasse, além de gerar confusão semântica, uma vez que a regra de negócio separa estritamente os papéis de conformidade e de mercado.
+ 
+    \item \textbf{Justificativa 2 (J2): Atributo Endereço:}
+    O atributo \texttt{Endereço} é composto e multivalorado, pois uma mesma Pessoa Jurídica pode possuir endereços de sede e de filiais simultaneamente. A solução estruturalmente correta escolhida é criar uma nova relação \texttt{ENDEREÇO} que recebe os componentes simples do endereço (logradouro, estado e CEP) junto à chave primária da relação proprietária (\textbf{CNPJ}). A chave primária desta nova tabela é a combinação \texttt{(CNPJ, CEP, Estado, Rua)}, garantindo que o mesmo endereço não seja duplicado para uma mesma empresa, ao mesmo tempo que permite múltiplas entradas para empresas com mais de uma localização. A alternativa de embutir colunas fixas de endereço diretamente em \texttt{PESSOA\_JURIDICA} (ex.: \texttt{Endereco1\_CEP}, \texttt{Endereco2\_CEP}) foi descartada por limitar artificialmente o número de endereços e gerar valores \texttt{NULL} para empresas com apenas uma sede.
+ 
+    \item \textbf{Justificativa 3 (J3): Especialização de Agente de Mercado:}
+    Optou-se por não incluir o atributo \texttt{Tipo} diretamente na superclasse \textbf{Agente de Mercado}. Em vez disso, criou-se uma tabela auxiliar \texttt{TIPO\_AGENTE\_MERCADO} para registrar a quais subtipos cada agente pertence, além de tabelas distintas para cada subclasse (\textbf{Originador} e \textbf{Comprador}). Como a especialização é \textbf{sobreposta} (um mesmo agente pode ser simultaneamente Originador e Comprador), essa abordagem permite identificar rapidamente todos os papéis de um agente apenas utilizando junções, sem a necessidade de varrer múltiplas tabelas de subclasse. A principal desvantagem é a fragmentação estrutural: para recuperar o perfil completo, o SGBD precisará executar \textit{JOINs} cruzando \texttt{PESSOA\_JURIDICA}, \texttt{AGENTE\_MERCADO}, \texttt{TIPO\_AGENTE\_MERCADO} e as tabelas de subclasse. Ressalta-se ainda que essa abordagem não garante nativamente a especialização total via DDL simples, exigindo validação complementar na camada de aplicação.
+ 
+    \item \textbf{Justificativa 4 (J4): Relacionamento Realiza (1:N entre Originador e Atividade):}
+    O relacionamento \textbf{Realiza} foi mapeado pela Técnica de Chave Estrangeira: a tabela do lado "N" (\texttt{ATIVIDADE}) absorveu a chave primária do lado "1" (\texttt{ORIGINADOR}) como FK. Essa escolha mantém o banco otimizado, atendendo plenamente ao requisito de que cada Atividade está vinculada \textbf{obrigatoriamente}  a um Originador, o que garante a \textbf{totalidade}. A alternativa de Referência Cruzada (criação de uma tabela de ligação, como \texttt{REALIZA\_ATIVIDADE}) é desencorajada para relacionamentos 1:N, pois introduz uma relação extra desnecessária, obrigando o SGBD a executar uma operação adicional de \textit{EQUIJUNÇÃO} apenas para descobrir o responsável pela atividade.
+ 
+    \item \textbf{Justificativa 5 (J5): Mapeamento Múltiplo de Relacionamentos 1:N na Tabela Atividade:}
+    Em vez de criar tabelas separadas para os relacionamentos \textbf{Realiza}, \textbf{Contém} e \textbf{Audita}, optou-se pela Técnica de Chave Estrangeira em todos os casos. A tabela \texttt{ATIVIDADE}, que representa o lado "N" de todos esses relacionamentos, absorveu as chaves estrangeiras do \textbf{Originador}, do \textbf{Projeto} e do \textbf{Auditor}. As justificativas para essa escolha espelham o raciocínio da J4, já que uma instância de \textbf{Projeto} precisa estar associada a uma \textbf{Atividade}. Porém, há um agravante: a criação de tabelas de ligação para cada relacionamento 1:N (como \texttt{REALIZA\_ATIVIDADE}, \texttt{CONTEM\_ATIVIDADE} e \texttt{AUDITA\_ATIVIDADE}) não apenas introduziria relações extras, mas também fragmentaria a estrutura do banco, tornando as consultas mais complexas e menos performáticas.
+ 
+    \item \textbf{Justificativa 6 (J6): Mapeamento da Agregação Laudo:}
+    Como o relacionamento \textbf{Audita} (entre Auditor e Atividade) foi embutido diretamente na tabela \texttt{ATIVIDADE} via FK do Auditor (conforme J5), a tupla de Atividade passou a representar, por si só, o próprio relacionamento gerador da agregação. Bastou, portanto, inserir a FK da Atividade dentro da tabela \texttt{LAUDO} para mapear a agregação de forma completa: o Laudo sabe exatamente qual Atividade auditou e, por transição estrutural, sabe quem é o Auditor, sem necessidade de armazenar novamente o CNPJ do Auditor no Laudo. A alternativa de incluir também a FK do Auditor diretamente em \texttt{LAUDO} foi descartada por introduzir redundância e risco de inconsistência: os dois campos deveriam sempre apontar para o mesmo Auditor da Atividade, o que não pode ser garantido nativamente pelo DDL.
+ 
+    \item \textbf{Justificativa 7 (J7): Relacionamento Gera (1:1 entre Atividade e Lote):}
+    O relacionamento \textbf{Gera} foi mapeado pela Técnica de Chave Estrangeira, com a FK posicionada na tabela \texttt{LOTE} (e não em \texttt{ATIVIDADE}), com as restrições \texttt{UNIQUE} e \texttt{NOT NULL}. Essa posição é semanticamente mais precisa: todo Lote necessariamente deriva de uma Atividade, enquanto uma Atividade pode ainda não ter gerado nenhum Lote — o que tornaria inevitável a presença de valores \texttt{NULL} caso a FK estivesse no lado oposto. A restrição \texttt{UNIQUE} é o elemento central do mapeamento, pois transforma uma FK comum (que naturalmente expressaria cardinalidade 1:N) em uma FK que impõe o 1:1 diretamente no DDL, sem necessidade de \textit{triggers} ou lógica adicional de aplicação. A criação de uma tabela intermediária de ligação foi descartada pelos mesmos motivos da J4.
+ 
+    \item \textbf{Justificativa 8 (J8): Especialização de Agente de Conformidade:}
+    Optou-se por criar uma tabela \texttt{AGENTE\_CONFORMIDADE} para a superclasse e tabelas distintas para cada subclasse (\texttt{AUDITOR} e \texttt{CERTIFICADOR}), com seus atributos específicos. O CNPJ é a chave primária de todas as tabelas, e a FK das subclasses referencia sempre \texttt{AGENTE\_CONFORMIDADE}. O atributo \texttt{Atribuição}, presente na superclasse, atua como discriminador do tipo do agente, permitindo identificar a subclasse correspondente sem consultar as tabelas especializadas diretamente. Diferentemente do mapeamento adotado para \textbf{Agente de Mercado} (J3), não foi criada uma tabela auxiliar de tipo, pois a especialização aqui é \textbf{disjunta}: cada agente pertence a exatamente uma subclasse, tornando desnecessário o controle de múltiplos papéis simultâneos. A desvantagem dessa abordagem é que, para recuperar o perfil completo de um agente de conformidade, o SGBD precisará cruzar \texttt{AGENTE\_CONFORMIDADE} com a tabela da subclasse correspondente. O modelo relacional sozinho não garante nativamente nem a disjunção nem a totalidade da especialização, conforme tratado nas Notas N8 e N9.
+ 
+    \item \textbf{Justificativa 9 (J9): Relacionamento N:N entre Transação e Lote:}
+    O relacionamento entre \textbf{Transação} e \textbf{Lote} foi mapeado via tabela intermediária \texttt{TRANSACAO\_LOTE}, devido à sua natureza Muitos-para-Muitos. Um Lote pode ser objeto de múltiplas transações ao longo de seu ciclo de vida (vendas sucessivas entre agentes), e uma única Transação (nota fiscal) pode englobar um conjunto de diferentes Lotes.
+ 
+    Duas alternativas foram consideradas e descartadas. A primeira seria inserir uma FK de Transação diretamente na tabela \texttt{LOTE}: isso limitaria cada Lote a uma única transação, tornando impossível registrar o histórico de vendas sucessivas do ativo e destruindo a rastreabilidade do ciclo de vida. A segunda alternativa seria inserir uma FK de Lote diretamente na tabela \texttt{TRANSACAO}: isso restringiria cada nota fiscal a um único Lote, impedindo que uma negociação envolva múltiplos ativos simultaneamente, o que contraria diretamente a regra de negócio. A criação da tabela intermediária é, portanto, a única solução estruturalmente correta para essa cardinalidade, pois preserva ambas as direções do relacionamento sem redundância.
+ 
+    \item \textbf{Justificativa 10 (J10): Atributo Derivado Duração:}
+    Optou-se por manter o atributo \texttt{Duração} fisicamente nas tabelas \texttt{PROJETO} e \texttt{ATIVIDADE}, ainda que seja derivado das datas de início e fim.
+ 
+    Duas alternativas foram consideradas. A primeira seria \textbf{não armazenar o atributo}, calculando-o sempre em tempo de execução via expressão SQL (\texttt{Data\_Fim - Data\_Inicio}) a cada consulta. Essa abordagem elimina qualquer risco de inconsistência, mas impõe um custo computacional recorrente em consultas de auditoria que varrem grandes volumes de registros, exatamente o caso de uso mais frequente do sistema. A segunda alternativa seria utilizar uma \textbf{coluna gerada} (\texttt{GENERATED ALWAYS AS}), recurso suportado pelo PostgreSQL, que manteria o valor atualizado automaticamente pelo SGBD sem intervenção de \textit{triggers} ou aplicação. Embora tecnicamente elegante, essa solução introduz dependência de uma funcionalidade específica do SGBD, reduzindo a portabilidade do esquema.
+ 
+    Optou-se pela persistência física do atributo por oferecer o melhor equilíbrio entre desempenho de leitura e simplicidade de implementação, dado que a \texttt{Duração} é determinada no cadastro e permanece estável enquanto as datas não forem alteradas. A consistência do valor é garantida por \textit{triggers} ou pela camada de aplicação, conforme detalhado na Nota N11.
+ 
+\end{itemize}
+ 
+\subsection{Notas do Modelo Relacional}
+ 
+As notas a seguir documentam restrições de implementação, decisões de integridade referencial e aspectos que exigem controle complementar na camada de aplicação ou via \textit{triggers}, uma vez que não podem ser garantidos exclusivamente pelo DDL do modelo relacional.
+ 
+\begin{itemize}
+ 
+    \item \textbf{Nota 1 (N1) -- Integridade Referencial:}
+    Os CNPJs nas tabelas de subclasse e na tabela \texttt{ENDEREÇO} são Chaves Estrangeiras (FK) referenciando \texttt{PESSOA\_JURIDICA}. Aplica-se \texttt{ON DELETE CASCADE} para que a exclusão de uma Pessoa Jurídica remova automaticamente seus endereços e registros de especialização, evitando registros órfãos.
+ 
+    \item \textbf{Nota 2 (N2) -- Restrição de Domínio:}
+    O campo \texttt{Status} da tabela \texttt{PESSOA\_JURIDICA} deve ter domínio restrito aos valores \texttt{'Apto'} e \texttt{'Inapto'}, imposto via cláusula \texttt{CHECK} no DDL.
+ 
+    \item \textbf{Nota 3 (N3) -- Especialização:}
+    Para garantir totalidade e disjunção na especialização de \textbf{Pessoa Jurídica} em \textbf{Agente de Mercado} e \textbf{Agente de Conformidade} (visto que o SGBD não impõe isso nativamente), devem ser utilizadas \textbf{triggers} ou lógica de aplicação para validar se o CNPJ inserido respeita as regras de negócio.
+ 
+    \item \textbf{Nota 4 (N4) -- Propagação de Exclusão:}
+    Como o CNPJ nas tabelas \texttt{ORIGINADOR}, \texttt{COMPRADOR} e \texttt{TIPO\_AGENTE\_MERCADO} referencia \texttt{AGENTE\_MERCADO}, configura-se \texttt{ON DELETE CASCADE}. Dessa forma, a exclusão do Agente central propaga automaticamente para suas categorias e papéis, evitando registros fantasmas no banco de dados.
+ 
+    \item \textbf{Nota 5 (N5) -- Sincronização de Identidade:}
+    O Modelo Relacional sozinho não garante que os valores gravados em \texttt{TIPO\_AGENTE\_MERCADO} reflitam a real existência do agente nas tabelas \texttt{ORIGINADOR} ou \texttt{COMPRADOR}. É necessário implementar uma camada de aplicação ou \textit{triggers} para assegurar que a inserção em uma das subclasses seja sempre refletida corretamente em \texttt{TIPO\_AGENTE\_MERCADO}, e vice-versa.
+ 
+    \item \textbf{Nota 6 (N6) -- Integridade Referencial:}
+    Adotando a Técnica de Chave Estrangeira, o campo \texttt{Originador} em \texttt{ATIVIDADE} deve apontar obrigatoriamente para um CNPJ existente e válido em \texttt{ORIGINADOR}. Para este relacionamento, a configuração ideal é \texttt{ON DELETE RESTRICT}: se um Originador já realizou atividades no campo, seu cadastro não pode ser excluído do sistema, pois isso destruiria a rastreabilidade do projeto de mitigação ambiental.
+ 
+    \item \textbf{Nota 7 (N7) -- Ciclo de Vida da Auditoria:}
+    Como a Atividade é cadastrada antes de qualquer fiscalização e o Auditor só é vinculado a ela posteriormente, a coluna \texttt{Auditor} na tabela \texttt{ATIVIDADE} deve nascer com valor \texttt{NULL} e ser atualizada via \texttt{UPDATE} no momento da contratação. A camada de aplicação é responsável por validar se uma Atividade já possui Auditor preenchido antes de permitir a emissão do respectivo Laudo.
+ 
+    \item \textbf{Nota 8 (N8) -- Garantia de Disjunção:}
+    A disjunção de \textbf{Agente de Conformidade} é parcialmente garantida via DDL pela cláusula \texttt{CHECK} sobre o atributo \texttt{Atribuição}, restringindo seus valores a \texttt{'Auditor'} ou \texttt{'Certificador'}. Para reforçar a consistência, deve-se implementar uma \textit{trigger} \texttt{BEFORE INSERT} nas tabelas \texttt{AUDITOR} e \texttt{CERTIFICADOR}, verificando se o valor de \texttt{Atribuição} em \texttt{AGENTE\_CONFORMIDADE} corresponde à subclasse sendo inserida e abortando a operação em caso de divergência. Isso impede, por exemplo, que um CNPJ com \texttt{Atribuição = 'Certificador'} seja inserido na tabela \texttt{AUDITOR}.
+ 
+    \item \textbf{Nota 9 (N9) -- Garantia de Totalidade:}
+    A totalidade da especialização de \textbf{Agente de Conformidade} não é garantida pelo DDL. Para impô-la, a camada de aplicação deve assegurar que toda inserção em \texttt{AGENTE\_CONFORMIDADE} seja acompanhada, na mesma transação, da inserção do respectivo registro em \texttt{AUDITOR} ou \texttt{CERTIFICADOR}, conforme o valor de \texttt{Atribuição}. Dessa forma, nunca existirá um Agente de Conformidade sem subclasse correspondente.
+ 
+    \item \textbf{Nota 10 (N10) -- Integridade Temporal:}
+    Tanto a tabela \texttt{PROJETO} quanto a tabela \texttt{ATIVIDADE} possuem os atributos \texttt{Data\_Inicio} e \texttt{Data\_Fim}. Para garantir que \texttt{Data\_Fim} nunca seja anterior a \texttt{Data\_Inicio}, deve-se aplicar a cláusula \texttt{CHECK (Data\_Fim >= Data\_Inicio)} no DDL de ambas as tabelas. Essa restrição é verificada automaticamente pelo SGBD em toda operação de \texttt{INSERT} ou \texttt{UPDATE}. Recomenda-se, adicionalmente, que a aplicação valide essa regra antes de submeter a operação ao banco, oferecendo uma mensagem de erro mais clara ao usuário.
+ 
+    \item \textbf{Nota 11 (N11) -- Cálculo de Atributo Derivado:}
+    Para garantir a consistência do atributo \texttt{Duração} (mapeado fisicamente conforme J10), a implementação deve assegurar que seu valor seja sempre o reflexo fiel da diferença entre \texttt{Data\_Fim} e \texttt{Data\_Inicio}. Essa integridade deve ser mantida preferencialmente via \textbf{triggers} (\texttt{BEFORE INSERT OR UPDATE}) no SGBD, que automatizam o recálculo sempre que houver alteração nas datas, ou por meio de lógica mandatória na camada de aplicação antes da persistência. Isso evita que o banco armazene valores obsoletos ou divergentes das datas balizadoras caso uma atualização ocorra apenas parcialmente.
+
+\end{itemize}
+
+% ============================================================
+\section{Correções da Parte 2}
+% ============================================================
+
+\begin{itemize}
+    \item \textbf{Novas Restrições do Modelo Relacional:} Novas restrições de \texttt{NOT NULL} foram adicionadas ao modelo relacional para reforçar a integridade de domínio e garantir que o banco reflita estritamente as regras de negócio do sistema:
+    \begin{itemize}
+        \item Na tabela \texttt{Projeto}, os atributos \texttt{Nome\_Projeto} e \texttt{Data\_Inicio} foram alterados para \texttt{NOT NULL}. O nome é essencial para a identificação semântica do projeto em relatórios gerenciais, enquanto a data de início é um marco temporal obrigatório para compor a restrição de consistência cronológica e viabilizar o cálculo do atributo derivado \texttt{Duracao}.
+        
+        \item Na tabela \texttt{Transacao}, o atributo \texttt{Valor} foi alterado para \texttt{NOT NULL}. Sendo o CarbonTrack uma plataforma que lida com ativos financeiros, uma transação sem valor monetário definido fere a integridade dos dados e inviabilizaria as consultas analíticas de faturamento e movimentação de mercado (como a Consulta C2).
+        
+        \item Na tabela \texttt{Pessoa\_Juridica}, os atributos base (\texttt{Razao\_Social}, \texttt{Nome\_Fantasia} e \texttt{Status}) foram alterados para \texttt{NOT NULL}. Por se tratar da superclasse estrutural de todas as instituições do sistema, a obrigatoriedade desses dados garante a identidade legal mínima para que qualquer empresa possa operar na plataforma.
+        
+        \item Na tabela \texttt{Agente\_Conformidade}, o atributo \texttt{Atribuicao} foi alterado para \texttt{NOT NULL}. Este atributo atua como o \textbf{discriminador} da especialização disjunta. Sua ausência impediria o sistema de identificar se o agente é um Auditor ou um Certificador, quebrando a lógica de roteamento e validação das tabelas filhas.
+        
+        \item Na tabela \texttt{Atividade}, o atributo \texttt{Data\_Inicio} foi alterado para \texttt{NOT NULL}. A definição do início do cronograma operacional é indispensável para gerar o registro de \texttt{Duracao} e garantir que o ciclo de vida da geração do crédito de carbono tenha um marco inicial auditável.
+        
+        \item Na tabela \texttt{Lote}, o atributo \texttt{Status\_Ciclo\_de\_Vida} foi alterado para \texttt{NOT NULL}. O ativo ambiental deve obrigatoriamente estar em um estado conhecido (Disponível, Aposentado ou Invalidado) para que a aplicação possa aplicar as restrições de mercado, como impedir a venda de créditos já aposentados.
+        
+        \item Na tabela \texttt{Laudo}, o atributo \texttt{Certificador} foi alterado para \texttt{NOT NULL}, garantindo que todo documento de auditoria submetido possua um órgão certificador legalmente responsável por sua futura avaliação.
+    \end{itemize}
+    
+    \item \textbf{Modificação na Justificativa J2:} A justificativa J2 afirmava que a solução proposta era "a única solução estruturalmente correta". Essa afirmação foi removida uma vez que era drástica e imprecisa.
+    
+    \item \textbf{Modificação na Justificativa J3:} A justificativa J3 afirmava que a solução permitia consultas rápidas sem a necessidade de buscar em outras tabelas. Foi adicionada a especificação sobre a necessidade do uso de junções (JOIN) na consulta.
+    
+    \item \textbf{Modificação na Justificativa J4 e J5:} As justificativas J4 e J5 definiam o requisito sobre cada Atividade estar vinculada a, no maximo, 1 Originador. Como a relação é, na verdade, de totalidade (sempre 1), as justificativas foram modificadas para especificar isso com mais precisão.
+\end{itemize}
+
+% ============================================================
+\section{Implementação (Parte 3)}
+% ============================================================
+A terceira etapa do projeto consistiu na materialização do Modelo Relacional especificado na Parte 2 em um banco de dados funcional, no carregamento de dados de teste, no desenvolvimento das consultas previstas e na construção de um protótipo de aplicação que interage com o banco. O foco foi garantir que todo o esquema relacional, incluindo as restrições de integridade e as regras de negócio (Notas N1--N11), fosse fielmente traduzido para comandos SQL e PL/pgSQL.
+
+Todo o código-fonte (scripts SQL, \textit{triggers}, dados e a aplicação) foi versionado em repositório Git e acompanhado de um \texttt{README.md} com instruções detalhadas de execução e reprodução do ambiente.
+
+\subsection{Ambiente de Desenvolvimento e Tecnologias}
+O desenvolvimento empregou o seguinte conjunto de ferramentas:
+
+\begin{itemize}
+    \item \textbf{PostgreSQL:} SGBD adotado como base do projeto, escolhido pela robustez, ampla aderência ao padrão SQL e suporte nativo a recursos avançados utilizados nas consultas (funções de janela como \texttt{LAG()}, \texttt{DISTINCT ON} e expressões \texttt{CHECK} com operador de regex \texttt{\textasciitilde}).
+    \item \textbf{SQL e PL/pgSQL:} linguagens do banco, usadas respectivamente para a definição do esquema (DDL), manipulação e consulta de dados (DML/DQL) e para a codificação das \textit{triggers} de regras de negócio.
+    \item \textbf{Python 3 (\texttt{tkinter}/\texttt{ttk} + \texttt{psycopg2}):} linguagem e bibliotecas da camada de aplicação. O \texttt{tkinter} fornece a interface gráfica desktop nativa e o \texttt{psycopg2} é o \textit{driver} de conexão com o PostgreSQL.
+    \item \textbf{Docker e Docker Compose:} contêinerização do ambiente, inicializando de forma padronizada e reprodutível os serviços de banco (\texttt{postgres\_db}) e de administração visual (\texttt{pgAdmin}).
+    \item \textbf{Git/GitHub:} controle de versão e colaboração entre os membros do grupo.
+\end{itemize}
+
+Além da aplicação, quatro scripts SQL centrais foram desenvolvidos na pasta \texttt{scripts\_sql/}: \texttt{esquema.sql} (DDL: criação das tabelas e restrições), \texttt{triggers.sql} (regras de negócio automáticas), \texttt{dados.sql} (DML: inserção de dados mockados) e \texttt{consultas.sql} (DQL: seis consultas analíticas).
+
+\subsection{Requisitos de Sistema}
+Para reproduzir o ambiente de banco de dados é necessário apenas o \textbf{Docker} e o \textbf{Docker Compose}. Na raiz do repositório, o comando \texttt{docker-compose up -d} cria o contêiner do PostgreSQL (com o banco \texttt{CarbonTrack} vinculado ao usuário \texttt{rapazinhos}) e o contêiner do pgAdmin. Em seguida, os scripts são injetados em ordem (esquema $\rightarrow$ triggers $\rightarrow$ dados) via \texttt{docker exec}.
+
+Para executar o protótipo gráfico, são requisitos adicionais: \textbf{Python 3} com o pacote de sistema \texttt{python3-tk} (interface \texttt{tkinter}) e a dependência \texttt{psycopg2-binary} (listada em \texttt{requirements.txt}). A aplicação conecta-se ao banco pela porta \texttt{5433} (mapeada do contêiner) usando as credenciais \texttt{rapazinhos}/\texttt{1234}.
+
+\subsection{Operações de Manipulação de Dados e Regras Automáticas}
+Esta seção apresenta os trechos de código que implementam as operações de \textbf{cadastro} (inserções) e as \textbf{regras de negócio} automáticas. Em todas as operações de escrita, os valores fornecidos pelo usuário são enviados ao banco por meio de \textit{placeholders} \texttt{\%s} do \texttt{psycopg2}, prática que separa o comando SQL dos dados e elimina o risco de injeção de SQL.
+
+\subsubsection{Cadastro de Projeto (\texttt{INSERT} em PROJETO)}
+Insere uma nova tupla na tabela \texttt{PROJETO}. Antes da persistência, a aplicação valida o formato das datas (N10) e calcula o atributo derivado \texttt{Duração} em dias (N11). \textbf{Localização:} arquivo \texttt{codigo\_sistema/app.py}, método \texttt{CarbonTrackApp.cadastrar\_projeto()}.
+
+\begin{lstlisting}[language=Python, caption={Inserção de Projeto com cálculo da Duração (N11).}]
+# codigo_sistema-aplicacao/app.py -- CarbonTrackApp.cadastrar_projeto()
+duracao = (d_fim - d_ini).days if d_fim is not None else None  # N11
+with self.conn.cursor() as cur:
+    cur.execute("""
+        INSERT INTO PROJETO
+            (Num_Licenca_Ambiental, Nome_Projeto, Data_Inicio,
+             Data_Fim, Duracao, Metodologia_Aplicada)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """, (num, nome, d_ini, d_fim, duracao, metod))
+self.conn.commit()
+\end{lstlisting}
+
+\subsubsection{Cadastro de Atividade (\texttt{INSERT} em ATIVIDADE)}
+Insere uma nova tupla na tabela \texttt{ATIVIDADE}, materializando os relacionamentos 1:N \textbf{Realiza} (Originador, obrigatório), \textbf{Contém} (Projeto, opcional) e \textbf{Audita} (Auditor, opcional). Os CNPJs e o número de licença são resolvidos a partir de caixas de seleção carregadas do próprio banco, garantindo a integridade referencial das FKs antes do envio. \textbf{Localização:} \texttt{codigo\_sistema/app.py}, método \texttt{CarbonTrackApp.cadastrar\_atividade()}.
+
+\begin{lstlisting}[language=Python, caption={Inserção de Atividade com chaves estrangeiras opcionais.}]
+# codigo_sistema-aplicacao/app.py -- CarbonTrackApp.cadastrar_atividade()
+with self.conn.cursor() as cur:
+    cur.execute("""
+        INSERT INTO ATIVIDADE
+            (Codigo_Ordem_Servico, Originador, Projeto, Auditor,
+             Descricao_Atividade, Custo_Operacional, Data_Inicio,
+             Data_Fim, Duracao, Credito_Estimado)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """, (cod, cnpj_orig, num_proj, cnpj_aud, desc, custo,
+          d_ini, d_fim, duracao, cred))
+self.conn.commit()
+\end{lstlisting}
+
+\subsubsection{Regras de Negócio Automáticas (\textit{Triggers})}
+As restrições que o DDL não garante sozinho foram implementadas como \textit{triggers} em PL/pgSQL. O Código~\ref{lst:trg-duracao} mostra o gatilho que recalcula automaticamente a \texttt{Duração} a cada \texttt{INSERT}/\texttt{UPDATE} (N11), reforçando no banco a mesma regra aplicada na interface. \textbf{Localização:} \texttt{scripts\_sql/triggers.sql}, função \texttt{calcular\_duracao()}.
+
+\begin{lstlisting}[language=SQL, caption={Trigger de cálculo do atributo derivado Duração (N11).}, label={lst:trg-duracao}]
+-- scripts_sql/triggers.sql -- funcao calcular_duracao()
+CREATE OR REPLACE FUNCTION calcular_duracao()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.Data_Fim IS NOT NULL THEN
+        NEW.Duracao := NEW.Data_Fim - NEW.Data_Inicio;
+    ELSE
+        NEW.Duracao := NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_calc_duracao_atividade
+BEFORE INSERT OR UPDATE ON ATIVIDADE
+FOR EACH ROW EXECUTE PROCEDURE calcular_duracao();
+\end{lstlisting}
+
+O mesmo arquivo concentra ainda as \textit{triggers} de \textbf{disjunção} da especialização de Agente de Conformidade (N8: \texttt{validar\_disjuncao\_auditor()} e \texttt{validar\_disjuncao\_certificador()}, que abortam a inserção quando a \texttt{Atribuição} diverge da subclasse) e de \textbf{sincronização de identidade} dos papéis sobrepostos de mercado (N5: \texttt{sincronizar\_tipo\_originador()} e \texttt{sincronizar\_tipo\_comprador()}, que populam automaticamente \texttt{TIPO\_AGENTE\_MERCADO}).
+
+\subsection{Consultas SQL}
+Foram implementadas seis consultas (mínimo exigido: cinco), cobrindo múltiplas junções, agregação, subconsultas correlacionadas e não-correlacionadas, funções de janela e divisão relacional. Todos os trechos a seguir encontram-se no arquivo \texttt{scripts\_sql/consultas.sql} e são espelhados nas constantes \texttt{SQL\_C1}--\texttt{SQL\_C6} de \texttt{codigo\_sistema/app.py}, onde o valor literal de filtro é substituído por um \textit{placeholder} \texttt{\%s} parametrizado.
+
+\subsubsection{C1: Rastreabilidade Completa de Lote (Múltiplas Junções)}
+Dado o número de série de um Lote, retorna seu histórico completo: a Atividade e o Projeto que o geraram, o Originador, o Auditor responsável, o Certificador que emitiu o Laudo e a transação mais recente. Emprega sete junções, combinando \texttt{JOIN} (relacionamentos obrigatórios) e \texttt{LEFT JOIN} (relacionamentos opcionais, como Projeto, Auditor e Laudo), além de uma CTE que isola a última transação por lote via \texttt{DISTINCT ON}.
+
+\begin{lstlisting}[language=SQL, caption={C1: Rastreabilidade completa de um Lote.}]
+WITH ultima_transacao AS (
+    SELECT DISTINCT ON (tl.Lote)
+        tl.Lote            AS num_serie,
+        t.Nota_Fiscal,
+        t.Data_Hora        AS data_ultima_transacao,
+        t.Valor            AS valor_ultima_transacao,
+        pj_c.Nome_Fantasia AS comprador_atual
+    FROM TRANSACAO_LOTE tl
+    JOIN TRANSACAO       t    ON tl.Transacao = t.Nota_Fiscal
+    JOIN PESSOA_JURIDICA pj_c ON t.Agente_Mercado_Comprador = pj_c.CNPJ
+    ORDER BY tl.Lote, t.Data_Hora DESC
+)
+SELECT
+    l.Num_Serie_Registro, l.Quantidade_de_Credito, l.Status_Ciclo_de_Vida,
+    a.Codigo_Ordem_Servico AS atividade,
+    p.Nome_Projeto,
+    pj_orig.Nome_Fantasia  AS originador,
+    pj_aud.Nome_Fantasia   AS auditor,
+    ld.Numero_do_Protocolo,
+    pj_cert.Nome_Fantasia  AS certificador,
+    ut.Nota_Fiscal         AS ultima_nota_fiscal,
+    ut.comprador_atual
+FROM LOTE l
+JOIN ATIVIDADE        a       ON l.Atividade     = a.Codigo_Ordem_Servico
+JOIN ORIGINADOR       orig    ON a.Originador    = orig.CNPJ
+JOIN PESSOA_JURIDICA  pj_orig ON orig.CNPJ       = pj_orig.CNPJ
+LEFT JOIN PROJETO     p       ON a.Projeto       = p.Num_Licenca_Ambiental
+LEFT JOIN AUDITOR     aud     ON a.Auditor       = aud.CNPJ
+LEFT JOIN PESSOA_JURIDICA pj_aud  ON aud.CNPJ    = pj_aud.CNPJ
+LEFT JOIN LAUDO       ld      ON ld.Atividade    = a.Codigo_Ordem_Servico
+LEFT JOIN CERTIFICADOR cert   ON ld.Certificador = cert.CNPJ
+LEFT JOIN PESSOA_JURIDICA pj_cert ON cert.CNPJ   = pj_cert.CNPJ
+LEFT JOIN ultima_transacao ut ON ut.num_serie    = l.Num_Serie_Registro
+WHERE l.Num_Serie_Registro = 'BR-VCS-2024-0001';
+\end{lstlisting}
+
+\subsubsection{C2: Desempenho de Projetos (Agrupamento e Agregação)}
+Lista, por Projeto, o total de Lotes emitidos, o total de créditos (tCO$_2$e), o valor financeiro movimentado (\texttt{Valor} $\times$ \texttt{Quantidade}) e o número de transações. Utiliza \texttt{GROUP BY} com as funções \texttt{COUNT} e \texttt{SUM}, e \texttt{LEFT JOIN} para que projetos sem lotes apareçam com valores zerados.
+
+\begin{lstlisting}[language=SQL, caption={C2: Desempenho de projetos por créditos e valor.}]
+SELECT
+    p.Num_Licenca_Ambiental,
+    p.Nome_Projeto,
+    COUNT(DISTINCT l.Num_Serie_Registro)                AS total_lotes_emitidos,
+    COALESCE(SUM(l.Quantidade_de_Credito), 0)           AS total_creditos_tCO2e,
+    COALESCE(SUM(l.Valor * l.Quantidade_de_Credito), 0) AS valor_total_lotes,
+    COUNT(DISTINCT tl.Transacao)                        AS total_transacoes
+FROM PROJETO p
+JOIN  ATIVIDADE      a   ON a.Projeto   = p.Num_Licenca_Ambiental
+LEFT JOIN LOTE       l   ON l.Atividade = a.Codigo_Ordem_Servico
+LEFT JOIN TRANSACAO_LOTE tl ON tl.Lote = l.Num_Serie_Registro
+GROUP BY p.Num_Licenca_Ambiental, p.Nome_Projeto
+ORDER BY total_creditos_tCO2e DESC;
+\end{lstlisting}
+
+\subsubsection{C3: Atividades Finalizadas sem Laudo (Subconsulta Não-Correlacionada)}
+Identifica atividades já encerradas (\texttt{Data\_Fim} no passado) que ainda não possuem nenhum Laudo registrado, um indicador de risco de conformidade. Usa uma subconsulta não-correlacionada com \texttt{NOT IN} sobre a tabela \texttt{LAUDO}.
+
+\begin{lstlisting}[language=SQL, caption={C3: Atividades finalizadas sem laudo de auditoria.}]
+SELECT
+    a.Codigo_Ordem_Servico,
+    pj.Nome_Fantasia     AS originador,
+    a.Descricao_Atividade,
+    a.Data_Inicio, a.Data_Fim,
+    a.Duracao            AS duracao_dias,
+    a.Credito_Estimado   AS credito_estimado_tCO2e,
+    pj_aud.Nome_Fantasia AS auditor_contratado
+FROM ATIVIDADE a
+JOIN  ORIGINADOR      orig ON a.Originador = orig.CNPJ
+JOIN  PESSOA_JURIDICA pj   ON orig.CNPJ    = pj.CNPJ
+LEFT JOIN PESSOA_JURIDICA pj_aud ON a.Auditor = pj_aud.CNPJ
+WHERE a.Data_Fim IS NOT NULL
+  AND a.Data_Fim < CURRENT_DATE
+  AND a.Codigo_Ordem_Servico NOT IN (SELECT l.Atividade FROM LAUDO l)
+ORDER BY a.Data_Fim;
+\end{lstlisting}
+
+\subsubsection{C4: Evolução de Preço de um Lote (Função de Janela)}
+Para um Lote específico, recupera a série histórica de preços ordenada cronologicamente, calculando a variação absoluta e percentual em relação ao registro anterior. Emprega a função de janela \texttt{LAG()} para acessar o preço da linha anterior sem auto-junção, e \texttt{NULLIF} para evitar divisão por zero.
+
+\begin{lstlisting}[language=SQL, caption={C4: Evolução histórica de preço com variação percentual.}]
+SELECT
+    hp.Num_Serie_Registro,
+    pj.Nome_Fantasia                AS originador_do_lote,
+    hp.Data,
+    hp.Preco                        AS preco_unitario,
+    hp.Preco - LAG(hp.Preco) OVER w AS variacao_abs,
+    ROUND(
+        (hp.Preco - LAG(hp.Preco) OVER w)
+        / NULLIF(LAG(hp.Preco) OVER w, 0) * 100
+    , 2)                            AS variacao_pct
+FROM HISTORICO_PRECO hp
+JOIN LOTE       l    ON hp.Num_Serie_Registro = l.Num_Serie_Registro
+JOIN ATIVIDADE  a    ON l.Atividade           = a.Codigo_Ordem_Servico
+JOIN ORIGINADOR orig ON a.Originador          = orig.CNPJ
+JOIN PESSOA_JURIDICA pj ON orig.CNPJ          = pj.CNPJ
+WHERE hp.Num_Serie_Registro = 'BR-VCS-2024-0001'
+WINDOW w AS (PARTITION BY hp.Num_Serie_Registro ORDER BY hp.Data)
+ORDER BY hp.Data;
+\end{lstlisting}
+
+\subsubsection{C5: Divisão Relacional (Originadores aprovados por TODAS as Certificadoras)}
+Consulta obrigatória de divisão relacional: encontra os Originadores que possuem Laudos emitidos por \textit{todas} as Certificadoras ativas (\texttt{Status = 'Apto'}) do sistema. É implementada pela dupla negação (\texttt{NOT EXISTS} aninhado), tradução direta do quantificador universal $\forall$: ``não existe certificadora ativa para a qual não exista laudo sobre uma atividade do originador''.
+
+\begin{lstlisting}[language=SQL, caption={C5: Divisão relacional via NOT EXISTS aninhado.}]
+SELECT
+    o.CNPJ,
+    pj.Nome_Fantasia AS originador,
+    pj.Status
+FROM ORIGINADOR      o
+JOIN PESSOA_JURIDICA pj ON o.CNPJ = pj.CNPJ
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM CERTIFICADOR        c
+    JOIN AGENTE_CONFORMIDADE ac  ON c.CNPJ = ac.CNPJ
+    JOIN PESSOA_JURIDICA     pjc ON c.CNPJ = pjc.CNPJ
+    WHERE pjc.Status = 'Apto'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM LAUDO     ld
+          JOIN ATIVIDADE a ON ld.Atividade = a.Codigo_Ordem_Servico
+          WHERE a.Originador    = o.CNPJ
+            AND ld.Certificador = c.CNPJ
+      )
+)
+ORDER BY pj.Nome_Fantasia;
+\end{lstlisting}
+
+\subsubsection{C6: Proprietário Atual de Cada Lote Disponível (Subconsulta Correlacionada)}
+Para cada Lote ``Disponível'', determina o proprietário atual por inferência (conforme a decisão arquitetural da Parte 1): se houver transações, o dono é o comprador da mais recente; caso contrário, é o Originador da Atividade que gerou o Lote (posse inicial, conforme N3). Combina uma CTE com \texttt{DISTINCT ON} e \texttt{COALESCE} para o \textit{fallback} ao Originador.
+
+\begin{lstlisting}[language=SQL, caption={C6: Proprietário atual inferido de cada lote disponível.}]
+WITH proprietario_por_transacao AS (
+    SELECT DISTINCT ON (tl.Lote)
+        tl.Lote                    AS num_serie,
+        t.Agente_Mercado_Comprador AS cnpj_dono_atual,
+        pj.Nome_Fantasia           AS nome_dono_atual,
+        t.Data_Hora                AS data_aquisicao,
+        'Transacao'                AS origem_posse
+    FROM TRANSACAO_LOTE  tl
+    JOIN TRANSACAO       t  ON tl.Transacao = t.Nota_Fiscal
+    JOIN PESSOA_JURIDICA pj ON t.Agente_Mercado_Comprador = pj.CNPJ
+    ORDER BY tl.Lote, t.Data_Hora DESC
+)
+SELECT
+    l.Num_Serie_Registro,
+    l.Quantidade_de_Credito              AS creditos_tCO2e,
+    l.Valor                              AS preco_unitario_atual,
+    COALESCE(pt.cnpj_dono_atual, a.Originador)           AS cnpj_proprietario,
+    COALESCE(pt.nome_dono_atual, pj_orig.Nome_Fantasia)  AS proprietario_atual,
+    COALESCE(pt.origem_posse,   'Originador inicial')    AS origem_posse
+FROM LOTE            l
+JOIN ATIVIDADE       a       ON l.Atividade  = a.Codigo_Ordem_Servico
+JOIN PESSOA_JURIDICA pj_orig ON a.Originador = pj_orig.CNPJ
+LEFT JOIN proprietario_por_transacao pt ON pt.num_serie = l.Num_Serie_Registro
+WHERE l.Status_Ciclo_de_Vida = 'Disponível'
+ORDER BY l.Num_Serie_Registro;
+\end{lstlisting}
+
+\subsection{A Aplicação (Protótipo Desktop)}
+A aplicação, desenvolvida em Python na pasta \texttt{codigo\_sistema/}, é uma interface gráfica desktop (\texttt{tkinter}) que se conecta ao PostgreSQL via \texttt{psycopg2}. Ela implementa duas funcionalidades de cadastro de dados com tratamento de erros e seis consultas parametrizadas, demonstrando de forma prática o uso da plataforma CarbonTrack.
+
+\subsubsection{Execução Parametrizada das Consultas}
+As consultas selecionadas pelo usuário são executadas com os parâmetros enviados via \textit{placeholders} \texttt{\%s}, e não por concatenação de \textit{strings}, tornando a aplicação imune a injeção de SQL. 
+
+\textbf{Localização:} \texttt{codigo\_sistema/app.py}, método \texttt{CarbonTrackApp.executar\_consulta()}.
+
+\begin{lstlisting}[language=Python, caption={Execução parametrizada de consulta (proteção contra SQL injection).}]
+# codigo_sistema-aplicacao/app.py -- CarbonTrackApp.executar_consulta()
+with self.conn.cursor() as cur:
+    cur.execute(info["sql"], tuple(valores))  # parametros via %s
+    colunas = [d[0] for d in cur.description]
+    linhas = cur.fetchall()
+\end{lstlisting}
+
+\subsubsection{Funcionalidades de Inserção}
+O protótipo disponibiliza formulários para o cadastro de \textbf{Projetos} e de \textbf{Atividades} de campo (seção 6.3). Antes de submeter a inserção ao banco, a aplicação executa diversas verificações e tratamentos de erro:
+
+\begin{itemize}
+    \item assegura o preenchimento dos campos obrigatórios e o formato correto de datas e valores monetários (via máscaras de entrada);
+    \item calcula o atributo derivado \texttt{Duração} a partir das datas (N10/N11);
+    \item resolve as chaves estrangeiras (Originador, Projeto, Auditor) a partir de listas carregadas do banco, evitando referências inexistentes;
+    \item converte exceções do \texttt{psycopg2} (violação de PK, FK, \texttt{CHECK} ou \texttt{NOT NULL}) em mensagens claras ao usuário, no método \texttt{\_tratar\_erro\_banco()}.
+\end{itemize}
+
+
+\begin{figure}[h!]
+    \centering
+    % Substitua o caminho abaixo pela captura de tela da aba de cadastro.
+    \includegraphics[width=0.85\textwidth]{images/app_cadastro.png}
+    \caption{Tela de cadastro de dados (aba ``Cadastro de Dados'').}
+    \label{fig:app-cadastro}
+\end{figure}
+
+
+\subsubsection{Funcionalidades de Consulta}
+A aba de consultas permite selecionar qualquer uma das seis consultas (C1--C6). Para aquelas que exigem entrada (C1 e C4, que recebem o número de série de um Lote), a aplicação gera dinamicamente o campo de parâmetro correspondente; as demais são executadas diretamente. Os resultados são exibidos em uma tabela com rolagem (\texttt{Treeview}), prontos para análise e verificação.
+
+
+
+\begin{figure}[h!]
+    \centering
+    % Substitua o caminho abaixo pela captura de tela da aba de consulta.
+    \includegraphics[width=0.85\textwidth]{images/app_consulta.png}
+    \caption{Tela de consultas parametrizadas e exibição de resultados.}
+    \label{fig:app-consulta}
+\end{figure}
+
+% Para adicionar mais capturas, basta duplicar o bloco "figure" acima,
+% trocando o arquivo da imagem (\includegraphics), a legenda (\caption)
+% e o rótulo (\label).
+
+% ============================================================
+\section{Conclusão}
+% ============================================================
+O desenvolvimento do projeto CarbonTrack proporcionou uma visão integral do ciclo de vida de um sistema de banco de dados, desde a concepção da ideia até a implementação prática de uma aplicação funcional. A construção evoluiu de forma incremental: partiu-se da modelagem conceitual (MER), seguiu-se para o refinamento do modelo relacional, com as devidas correções a partir do \textit{feedback} das entregas anteriores, e culminou na materialização do esquema em PostgreSQL, na codificação das regras de negócio e na criação do protótipo de interface.
+
+Entre os principais desafios encontrados ao longo do projeto, destacam-se o mapeamento das hierarquias de especialização e a inferência de propriedade dos Lotes. Traduzir as especializações (sobreposta para Agente de Mercado e disjunta para Agente de Conformidade) preservando totalidade e disjunção exigiu decisões cuidadosas, visto que o modelo relacional não garante essas restrições nativamente, demandando o uso de \textit{triggers} e validações na camada de aplicação. De forma semelhante, a decisão de inferir o dono atual de um Lote por consulta, em vez de armazená-lo de forma redundante, evitou ciclos e inconsistências no modelo, mas elevou a complexidade das consultas C1 e C6, que combinam CTEs, \texttt{DISTINCT ON} e \texttt{COALESCE}. A formulação da consulta C5 via dupla negação (\texttt{NOT EXISTS} aninhado) foi igualmente exigente, por traduzir o quantificador universal da álgebra relacional para SQL. Por fim, a integração entre aplicação e banco de dados demandou atenção especial no tratamento de erros do SGBD (violações de PK, FK e \texttt{CHECK}) e na sincronização entre as validações da interface e as restrições do banco.
+
+O projeto consolidou, na prática, conceitos fundamentais vistos em aula: a tradução sistemática de um MER para o modelo relacional, as técnicas de mapeamento de relacionamentos e especializações, a escrita de consultas SQL de complexidade crescente (junções múltiplas, agregação, subconsultas correlacionadas, funções de janela e divisão relacional) e o uso de \textit{triggers} em PL/pgSQL para automatizar regras de negócio. O emprego de \textbf{Docker} para padronizar o ambiente e de \textbf{Git} para o controle de versão evidenciou ainda a importância de boas práticas de engenharia de software no trabalho colaborativo em equipe.
+
+A estrutura do trabalho em etapas progressivas mostrou-se eficaz, pois permitiu amadurecer o modelo gradualmente em vez de concentrar todo o esforço ao final. Como sugestão para turmas seguintes, seria proveitoso que o material de apoio incluísse mais exemplos práticos de mapeamento de especializações e de implementação de \textit{triggers}, que estiveram entre os pontos mais trabalhosos. Antecipar a definição das consultas analíticas para o início do projeto também ajudaria a validar mais cedo se o modelo relacional atende adequadamente aos requisitos de recuperação de dados, evitando ajustes tardios no esquema. Por fim, a adoção de um ambiente conteinerizado desde a primeira etapa reduziria atritos de configuração entre os membros do grupo.
+
+\end{document}
+
