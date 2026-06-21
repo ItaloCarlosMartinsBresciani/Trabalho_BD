@@ -104,6 +104,7 @@ sudo apt-get install -y python3-tk
 ### 2. Dependências do Python (Ambiente Virtual)
 Ative a sua `venv` (ou crie uma) e certifique-se de que o driver de conexão com o PostgreSQL está instalado:
 ```bash
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -122,8 +123,7 @@ Na tela inicial que irá se abrir, preencha as credenciais do banco para acessar
 ---
 
 ### Comandos Úteis do Docker
-- **Pausar** o ambiente (sem perder dados): `docker-compose stop`
-- **Retomar** ambiente pausado: `docker-compose start`
-- **Derrubar** o ambiente (dados da sessão são mantidos nos volumes de disco): `docker-compose down`
-- **Reset Completo (Cuidado!):** Apagar os containers e **todos os dados** e configurações do banco (útil se errar a estrutura ou duplicar os dados e precisar recomeçar limpo do zero): `docker-compose down -v`
-
+- **Pausar** o ambiente (sem perder dados): `docker-compose stop` ou `docker compose stop` se o primeiro não rodar devido a versão do Docker.
+- **Retomar** ambiente pausado: `docker-compose start` ou `docker compose start`.
+- **Derrubar** o ambiente (dados da sessão são mantidos nos volumes de disco): `docker-compose down` ou `docker compose down`.
+- **Reset Completo (Cuidado!):** Apagar os containers e **todos os dados** e configurações do banco (útil se errar a estrutura ou duplicar os dados e precisar recomeçar limpo do zero): `docker-compose down -v` ou `docker compose down -v`.

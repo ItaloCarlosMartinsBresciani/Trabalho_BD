@@ -8,7 +8,6 @@
 --
 --   A primeira : Rastreabilidade Completa de Lote com múltiplos JOINs internos e externos (LEFT JOIN)
 --       
---
 --   Segunda: Desempenho de Projetos por Créditos e Valor Financeiro atraves de agrupamento (GROUP BY) com funções de agregação + LEFT JOIN
 --  
 --   Terceira: Atividades Finalizadas sem Laudo de Auditoria atraves de subconsulta NÃO-CORRELACIONADA (NOT IN) + JOIN
