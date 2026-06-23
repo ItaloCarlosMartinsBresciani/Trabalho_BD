@@ -11,6 +11,7 @@
 \usepackage{graphicx} % Pacote necessário para inserir imagens
 \usepackage{listings} % Realce de código-fonte (Parte 3)
 \usepackage{xcolor}
+\usepackage{float}
 
 % --- Estilo de realce de sintaxe para os trechos de código (Parte 3) ---
 \definecolor{codegreen}{rgb}{0.00,0.45,0.13}
@@ -378,7 +379,7 @@ Para executar o protótipo gráfico, são requisitos adicionais: \textbf{Python 
 Esta seção apresenta os trechos de código que implementam as operações de \textbf{cadastro} (inserções) e as \textbf{regras de negócio} automáticas. Em todas as operações de escrita, os valores fornecidos pelo usuário são enviados ao banco por meio de \textit{placeholders} \texttt{\%s} do \texttt{psycopg2}, prática que separa o comando SQL dos dados e elimina o risco de injeção de SQL.
 
 \subsubsection{Cadastro de Projeto (\texttt{INSERT} em PROJETO)}
-Insere uma nova tupla na tabela \texttt{PROJETO}. Antes da persistência, a aplicação valida o formato das datas (N10) e calcula o atributo derivado \texttt{Duração} em dias (N11). \textbf{Localização:} arquivo \texttt{codigo\_sistema/app.py}, método \texttt{CarbonTrackApp.cadastrar\_projeto()}.
+Insere uma nova tupla na tabela \texttt{PROJETO}. Antes da persistência, a aplicação valida o formato das datas (N10) e calcula o atributo derivado \texttt{Duração} em dias (N11). \textbf{Localização:} arquivo \texttt{codigo\_sistema-aplicacao/app.py}, método \texttt{CarbonTrackApp.cadastrar\_projeto()}.
 
 \begin{lstlisting}[language=Python, caption={Inserção de Projeto com cálculo da Duração (N11).}]
 # codigo_sistema-aplicacao/app.py -- CarbonTrackApp.cadastrar_projeto()
@@ -394,7 +395,7 @@ self.conn.commit()
 \end{lstlisting}
 
 \subsubsection{Cadastro de Atividade (\texttt{INSERT} em ATIVIDADE)}
-Insere uma nova tupla na tabela \texttt{ATIVIDADE}, materializando os relacionamentos 1:N \textbf{Realiza} (Originador, obrigatório), \textbf{Contém} (Projeto, opcional) e \textbf{Audita} (Auditor, opcional). Os CNPJs e o número de licença são resolvidos a partir de caixas de seleção carregadas do próprio banco, garantindo a integridade referencial das FKs antes do envio. \textbf{Localização:} \texttt{codigo\_sistema/app.py}, método \texttt{CarbonTrackApp.cadastrar\_atividade()}.
+Insere uma nova tupla na tabela \texttt{ATIVIDADE}, materializando os relacionamentos 1:N \textbf{Realiza} (Originador, obrigatório), \textbf{Contém} (Projeto, opcional) e \textbf{Audita} (Auditor, opcional). Os CNPJs e o número de licença são resolvidos a partir de caixas de seleção carregadas do próprio banco, garantindo a integridade referencial das FKs antes do envio. \textbf{Localização:} \texttt{codigo\_sistema-aplicacao/app.py}, método \texttt{CarbonTrackApp.cadastrar\_atividade()}.
 
 \begin{lstlisting}[language=Python, caption={Inserção de Atividade com chaves estrangeiras opcionais.}]
 # codigo_sistema-aplicacao/app.py -- CarbonTrackApp.cadastrar_atividade()
@@ -435,7 +436,7 @@ FOR EACH ROW EXECUTE PROCEDURE calcular_duracao();
 O mesmo arquivo concentra ainda as \textit{triggers} de \textbf{disjunção} da especialização de Agente de Conformidade (N8: \texttt{validar\_disjuncao\_auditor()} e \texttt{validar\_disjuncao\_certificador()}, que abortam a inserção quando a \texttt{Atribuição} diverge da subclasse) e de \textbf{sincronização de identidade} dos papéis sobrepostos de mercado (N5: \texttt{sincronizar\_tipo\_originador()} e \texttt{sincronizar\_tipo\_comprador()}, que populam automaticamente \texttt{TIPO\_AGENTE\_MERCADO}).
 
 \subsection{Consultas SQL}
-Foram implementadas seis consultas (mínimo exigido: cinco), cobrindo múltiplas junções, agregação, subconsultas correlacionadas e não-correlacionadas, funções de janela e divisão relacional. Todos os trechos a seguir encontram-se no arquivo \texttt{scripts\_sql/consultas.sql} e são espelhados nas constantes \texttt{SQL\_C1}--\texttt{SQL\_C6} de \texttt{codigo\_sistema/app.py}, onde o valor literal de filtro é substituído por um \textit{placeholder} \texttt{\%s} parametrizado.
+Foram implementadas seis consultas (mínimo exigido: cinco), cobrindo múltiplas junções, agregação, subconsultas correlacionadas e não-correlacionadas, funções de janela e divisão relacional. Todos os trechos a seguir encontram-se no arquivo \texttt{scripts\_sql/consultas.sql} e são espelhados nas constantes \texttt{SQL\_C1}--\texttt{SQL\_C6} de \texttt{codigo\_sistema-aplicacao/app.py}, onde o valor literal de filtro é substituído por um \textit{placeholder} \texttt{\%s} parametrizado.
 
 \subsubsection{C1: Rastreabilidade Completa de Lote (Múltiplas Junções)}
 Dado o número de série de um Lote, retorna seu histórico completo: a Atividade e o Projeto que o geraram, o Originador, o Auditor responsável, o Certificador que emitiu o Laudo e a transação mais recente. Emprega sete junções, combinando \texttt{JOIN} (relacionamentos obrigatórios) e \texttt{LEFT JOIN} (relacionamentos opcionais, como Projeto, Auditor e Laudo), além de uma CTE que isola a última transação por lote via \texttt{DISTINCT ON}.
@@ -601,12 +602,12 @@ ORDER BY l.Num_Serie_Registro;
 \end{lstlisting}
 
 \subsection{A Aplicação (Protótipo Desktop)}
-A aplicação, desenvolvida em Python na pasta \texttt{codigo\_sistema/}, é uma interface gráfica desktop (\texttt{tkinter}) que se conecta ao PostgreSQL via \texttt{psycopg2}. Ela implementa duas funcionalidades de cadastro de dados com tratamento de erros e seis consultas parametrizadas, demonstrando de forma prática o uso da plataforma CarbonTrack.
+A aplicação, desenvolvida em Python na pasta \texttt{codigo\_sistema-aplicacao/}, é uma interface gráfica desktop (\texttt{tkinter}) que se conecta ao PostgreSQL via \texttt{psycopg2}. Ela implementa duas funcionalidades de cadastro de dados com tratamento de erros e seis consultas parametrizadas, demonstrando de forma prática o uso da plataforma CarbonTrack.
 
 \subsubsection{Execução Parametrizada das Consultas}
 As consultas selecionadas pelo usuário são executadas com os parâmetros enviados via \textit{placeholders} \texttt{\%s}, e não por concatenação de \textit{strings}, tornando a aplicação imune a injeção de SQL. 
 
-\textbf{Localização:} \texttt{codigo\_sistema/app.py}, método \texttt{CarbonTrackApp.executar\_consulta()}.
+\textbf{Localização:} \texttt{codigo\_sistema-aplicacao/app.py}, método \texttt{CarbonTrackApp.executar\_consulta()}.
 
 \begin{lstlisting}[language=Python, caption={Execução parametrizada de consulta (proteção contra SQL injection).}]
 # codigo_sistema-aplicacao/app.py -- CarbonTrackApp.executar_consulta()
@@ -641,7 +642,7 @@ A aba de consultas permite selecionar qualquer uma das seis consultas (C1--C6). 
 
 
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     % Substitua o caminho abaixo pela captura de tela da aba de consulta.
     \includegraphics[width=0.85\textwidth]{images/app_consulta.png}
@@ -665,4 +666,3 @@ O projeto consolidou, na prática, conceitos fundamentais vistos em aula: a trad
 A estrutura do trabalho em etapas progressivas mostrou-se eficaz, pois permitiu amadurecer o modelo gradualmente em vez de concentrar todo o esforço ao final. Como sugestão para turmas seguintes, seria proveitoso que o material de apoio incluísse mais exemplos práticos de mapeamento de especializações e de implementação de \textit{triggers}, que estiveram entre os pontos mais trabalhosos. Antecipar a definição das consultas analíticas para o início do projeto também ajudaria a validar mais cedo se o modelo relacional atende adequadamente aos requisitos de recuperação de dados, evitando ajustes tardios no esquema. Por fim, a adoção de um ambiente conteinerizado desde a primeira etapa reduziria atritos de configuração entre os membros do grupo.
 
 \end{document}
-
